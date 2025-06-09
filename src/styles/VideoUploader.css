@@ -1,0 +1,566 @@
+/* Dashboard container */
+.dashboard-container {
+  display: flex;
+  flex-direction: column;
+}
+
+/* Dashboard header */
+.dashboard-header {
+  background-color: #1a1a1a4f;
+  color: white;
+  font-weight: bold;
+  padding: 20px 0;
+  text-align: center;
+  width: 100vw;
+}
+
+.dashboard-header h1 {
+  font-size: 28px;
+  font-weight: 600;
+  margin: 0;
+}
+
+/* Dashboard content grid */
+.dashboard-content {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 20px;
+  padding: 20px;
+  background-color: #e0e5ec;
+    background-image: url('../assets/Rural_Meadow.jpg');
+
+  background-size: cover;
+  background-position: center;
+  flex: 1;
+  min-height: 40vh;
+}
+
+/* Card styling */
+.dashboard-card {
+  background-color: rgba(255, 255, 255, 0.735);
+  border-radius: 10px;
+  padding: 20px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  
+}
+
+.dashboard-card h2 {
+  font-size: 18px;
+  margin-bottom: 15px;
+  color: #000000;
+  border-bottom: 1px solid #000000b0;
+  padding-bottom: 10px;
+}
+
+.video-drop-area {
+  width: 100%;
+  height: 25vh;
+  border: 2px dashed #ffffff;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 15px;
+  cursor: pointer;
+  overflow: hidden;
+  background-color: #0000003f;
+}
+
+.video-drop-area:hover {
+  border-color: #6d87ff;
+}
+
+.drag-drop-placeholder {
+  text-align: center;
+  color: #ffffff;
+   font-size: 16px;
+  font-weight: 500;
+}
+
+.video-preview {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.video-input {
+  display: none;
+}
+
+.action-buttons {
+  display: flex;
+  gap: 10px;
+  margin-top: 15px;
+}
+
+.browse-button, .detect-button {
+  flex: 1;
+  padding: 10px;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  border: none;
+  transition: all 0.2s ease;
+}
+
+.browse-button {
+  background-color: #3949ab;
+  color: white;
+}
+
+.browse-button:hover {
+  background-color: #394072;
+}
+
+.detect-button {
+  background-color: #8d1b1b;
+  color: white;
+}
+
+.detect-button:hover {
+  background-color: #c62828;
+}
+
+.detect-button:disabled {
+  background-color: #cd131359;
+  cursor: not-allowed;
+}
+
+/* Progress bar */
+.progress-container {
+  margin-top: 15px;
+}
+
+.progress-bar-bg {
+  width: 100%;
+  height: 8px;
+  background-color: #e6e6e6;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.progress-bar-fill {
+  height: 100%;
+  background-color: #316533;
+  transition: width 0.3s ease;
+}
+
+.progress-text {
+  font-size: 12px;
+  color: #000000;
+  text-align: right;
+  margin-top: 5px;
+}
+
+/* Detection info section */
+
+.threshold-section {
+  margin-top: 20px;
+}
+
+.threshold-section h3 {
+  font-size: 16px;
+  color: #000000;
+  margin-bottom: 10px;
+}
+
+.threshold-selector {
+  position: relative;
+  width: 100%;
+}
+
+.threshold-dropdown {
+  width: 100%;
+  padding: 8px 12px;
+  appearance: none;
+  border: 1px solid #ffffff00;
+  border-radius: 4px;
+  background-color: #417bb69a;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.dropdown-arrow {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  pointer-events: none;
+  color: #ffffff;
+}
+
+/* Model performance section */
+.model-performance {
+  grid-column: span 1;
+  
+}
+
+.metrics-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: 1fr 1fr;
+  gap: 15px;
+  height: calc(100% - 60px);
+}
+
+/* Results section */
+.results-section {
+  display: grid;
+  grid-template-columns: 3fr 2fr;
+  gap: 20px;
+  padding: 0 20px 20px;
+    background-image: url('../assets/Rural_Meadow.jpg');
+  background-size: cover;
+  background-position: center bottom;
+  flex: 1;
+  min-height: 40vh;
+}
+
+.schedule-results, .objects-detected {
+  background-color: rgba(255, 255, 255, 0.648);
+  border-radius: 10px;
+  padding: 20px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.schedule-results h2, .objects-detected h2 {
+  font-size: 18px;
+  margin-bottom: 15px;
+  color: #333;
+  border-bottom: 1px solid #eee;
+  padding-bottom: 10px;
+}
+
+/* Results table */
+.results-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 1rem;
+  background-color: rgba(0, 0, 0, 0.438);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.results-table th,
+.results-table td {
+  padding: 0.75rem;
+  text-align: left;
+  border-bottom: 1px solid #e2e8f0;
+  color: #000000;
+}
+
+.results-table th {
+  background-color: #f8fafc;
+  font-weight: 600;
+  color: #000000;
+}
+
+.results-table tr:hover {
+  background-color: rgba(220, 221, 222, 0.872);
+}
+
+.status-badge {
+  display: inline-block;
+  padding: 0.25rem 0.5rem;
+  border-radius: 9999px;
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+.status-badge.detected {
+  background-color: #00000079;
+  color: #166534;
+}
+
+.status-badge.missed {
+  background-color: #fee2e2;
+  color: #991b1b;
+}
+
+.confidence-badge {
+  display: inline-block;
+  padding: 0.25rem 0.5rem;
+  border-radius: 9999px;
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+.confidence-badge.high {
+  background-color: #dbeafe;
+  color: #1e40af;
+}
+
+.confidence-badge.low {
+  background-color: #fef3c7;
+  color: #92400e;
+}
+
+.false-positive-badge {
+  display: inline-block;
+  padding: 0.25rem 0.5rem;
+  border-radius: 9999px;
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+.false-positive-badge.true {
+  background-color: #fee2e2;
+  color: #991b1b;
+}
+
+.false-positive-badge.false {
+  background-color: #dcfce7;
+  color: #166534;
+}
+
+.no-data {
+  text-align: center;
+  color: #64748b;
+  padding: 2rem;
+}
+
+tr.detected {
+  background-color: #f0fdf4;
+}
+
+tr.missed {
+  background-color: #fef2f2;
+}
+
+/* Dashboard footer */
+.dashboard-footer {
+  padding: 20px 20px;
+  background-color: #6e9a547d;
+  color: white;
+  font-size: 18px;
+}
+
+/* Responsive styles */
+@media (max-width: 1024px) {
+  .dashboard-content {
+    grid-template-columns: 1fr 1fr;
+  }
+  
+  .upload-section {
+    grid-column: span 2;
+  }
+}
+
+@media (max-width: 768px) {
+  .dashboard-content {
+    grid-template-columns: 1fr;
+  }
+  
+  .upload-section, .detection-info, .model-performance{
+    grid-column: span 1;
+  }
+
+  .results-section, .objects-detected {
+    grid-column: span 1.5;
+  }
+
+  .results-table {
+    display: block;
+    overflow-x: auto;
+    white-space: nowrap;
+  }
+}
+
+@media (min-width: 1600px) {
+  .metric-box {
+    padding: 25px;
+  }
+  
+  .metric-value {
+    font-size: 32px;
+  }
+  
+  .metric-label {
+    font-size: 16px;
+  }
+  
+  .results-table th, .results-table td {
+    padding: 15px 20px;
+  }
+}
+
+.detection-stats {
+  display: flex;
+  justify-content: space-around;
+  margin: 20px 0;
+  padding: 15px;
+  background: rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+}
+
+.stat-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.stat-label {
+  font-size: 0.9rem;
+  color: #000000;
+  margin-bottom: 5px;
+}
+
+.stat-value {
+  font-size: 1.8rem;
+  font-weight: bold;
+  color: #24578a;
+}
+
+
+.empty-chart-placeholder {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 200px;
+  width: 100%;
+  background: #00000045;
+  border-radius: 8px;
+  color: #ffffff;
+  font-size: 14px;
+}
+
+.empty-chart-placeholder p {
+  margin: 0;
+  padding: 20px;
+  text-align: center;
+}
+
+/* Add styles for the pie chart labels */
+.recharts-pie-label-text {
+  font-size: 12px;
+  font-weight: 500;
+}
+
+/* Style the legend */
+.recharts-legend-item-text {
+  font-size: 12px;
+  color: #666;
+}
+
+/* Style the tooltip */
+.recharts-tooltip-wrapper {
+  background: white;
+  border-radius: 4px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  padding: 8px;
+}
+
+.schedule-results {
+  margin: 20px 0;
+  padding: 20px;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.results-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 15px;
+}
+
+.results-table th,
+.results-table td {
+  padding: 12px;
+  text-align: left;
+  border-bottom: 1px solid #eee;
+}
+
+.results-table th {
+  background-color: #f5f5f5;
+  font-weight: 600;
+}
+
+.status-badge {
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 0.9em;
+  font-weight: 500;
+}
+
+.status-badge.detected {
+  background-color: #e6f4ea;
+  color: #1e7e34;
+}
+
+.status-badge.missed {
+  background-color: #fbe9e7;
+  color: #d32f2f;
+}
+
+.confidence-badge {
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 0.9em;
+}
+
+.confidence-badge.high {
+  background-color: #e3f2fd;
+  color: #1976d2;
+}
+
+.confidence-badge.low {
+  background-color: #fff3e0;
+  color: #f57c00;
+}
+
+.no-data {
+  text-align: center;
+  color: #666;
+  padding: 20px;
+}
+
+tr.detected {
+  background-color: #f1f8e9;
+}
+
+tr.missed {
+  background-color: #ffebee;
+}
+
+.chart-container {
+  display: flex;
+  align-items: flex-start;
+  gap: 20px;
+  margin-top: 20px;
+}
+
+.object-stats {
+  background: rgba(255, 255, 255, 0.9);
+  padding: 15px;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  min-width: 200px;
+}
+
+.object-stats h3 {
+  margin: 0 0 10px 0;
+  font-size: 16px;
+  color: #333;
+  border-bottom: 1px solid #eee;
+  padding-bottom: 8px;
+}
+
+.object-stats ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.object-stats li {
+  padding: 5px 0;
+  font-size: 14px;
+  display: flex;
+  justify-content: space-between;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.object-stats li:last-child {
+  border-bottom: none;
+}

@@ -1,0 +1,114 @@
+{
+  "train_frames": [
+    {
+      "frame": "frame_0010.jpg",
+      "timestamp": "0:00:10",
+      "timestamp_seconds": 10.0,
+      "path": "C:\\Users\\groov\\Desktop\\COS40005-react-app\\COS40005-react-app\\backend\\inference_results\\frame_0010.jpg",
+      "detections": [
+        {
+          "class": "train",
+          "confidence": 0.85,
+          "bbox": [
+            0.4206470251083374,
+            122.31045532226562,
+            397.5453186035156,
+            245.86978149414062
+          ]
+        }
+      ]
+    },
+    {
+      "frame": "frame_0011.jpg",
+      "timestamp": "0:00:11",
+      "timestamp_seconds": 11.0,
+      "path": "C:\\Users\\groov\\Desktop\\COS40005-react-app\\COS40005-react-app\\backend\\inference_results\\frame_0011.jpg",
+      "detections": [
+        {
+          "class": "train",
+          "confidence": 0.84,
+          "bbox": [
+            0.48666512966156006,
+            109.41496276855469,
+            385.10113525390625,
+            271.27459716796875
+          ]
+        }
+      ]
+    }
+  ],
+  "statistics": {
+    "total_frames": 18,
+    "frames_with_trains": 2,
+    "detection_rate": 11.11,
+    "avg_confidence": 0.84,
+    "false_positives": 0,
+    "precision": 1.0,
+    "recall": 0.85,
+    "f1_score": 0.92,
+    "duration_seconds": 17.1,
+    "object_counts": {
+      "train": 2
+    },
+    "detection_time_seconds": 74.91,
+    "detection_fps": 3.76
+  },
+  "video_path": "uploads\\Untitled.mp4",
+  "schedule": [
+    {
+      "train_id": 1,
+      "expected_time": 2.85,
+      "expected_timestamp": "0:00:02",
+      "tolerance": 15,
+      "detected": true,
+      "detection_times": [
+        10.0
+      ],
+      "confidence": 0.85
+    },
+    {
+      "train_id": 2,
+      "expected_time": 5.7,
+      "expected_timestamp": "0:00:05",
+      "tolerance": 15,
+      "detected": true,
+      "detection_times": [
+        10.0
+      ],
+      "confidence": 0.85
+    },
+    {
+      "train_id": 3,
+      "expected_time": 8.55,
+      "expected_timestamp": "0:00:08",
+      "tolerance": 15,
+      "detected": true,
+      "detection_times": [
+        10.0
+      ],
+      "confidence": 0.85
+    },
+    {
+      "train_id": 4,
+      "expected_time": 11.4,
+      "expected_timestamp": "0:00:11",
+      "tolerance": 15,
+      "detected": true,
+      "detection_times": [
+        11.0
+      ],
+      "confidence": 0.84
+    },
+    {
+      "train_id": 5,
+      "expected_time": 14.25,
+      "expected_timestamp": "0:00:14",
+      "tolerance": 15,
+      "detected": true,
+      "detection_times": [
+        11.0
+      ],
+      "confidence": 0.84
+    }
+  ]
+}
