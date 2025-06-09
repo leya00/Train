@@ -1,106 +1,69 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { NavLink } from 'react-router-dom';
 
 const NavBar: React.FC = () => {
-  const [isOpen, setIsOpen] = useState(false);
-  const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
-
-  useEffect(() => {
-    const handleResize = () => {
-      setIsMobile(window.innerWidth <= 768);
-      if (window.innerWidth > 768) setIsOpen(false); // reset on desktop
-    };
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
-  }, []);
-
   return (
     <nav style={navStyle}>
       <div style={logoStyle}>TrainAI</div>
-
-      {isMobile && (
-        <div style={hamburgerStyle} onClick={() => setIsOpen(!isOpen)}>
-          <div style={lineStyle}></div>
-          <div style={lineStyle}></div>
-          <div style={lineStyle}></div>
-        </div>
-      )}
-
-      <div
-        style={{
-          ...linkContainerStyle,
-          ...(isMobile ? (isOpen ? mobileMenuOpenStyle : mobileMenuClosedStyle) : {}),
-        }}
-      >
-        <NavLink to="/" end style={navLinkStyle} onClick={() => setIsOpen(false)}>
+      <div style={linkContainerStyle}>
+        <NavLink to="/" end style={navLinkStyle}>
           Home
         </NavLink>
-        <NavLink to="/researcher" style={navLinkStyle} onClick={() => setIsOpen(false)}>
+        <NavLink to="/researcher" style={navLinkStyle}>
           Researcher
         </NavLink>
-        <NavLink to="/commuter" style={navLinkStyle} onClick={() => setIsOpen(false)}>
+        <NavLink to="/commuter" style={navLinkStyle}>
           Commuter
+        </NavLink>
+        <NavLink to="/schedual" style={navLinkStyle}>
+          schedual
+        </NavLink>
+        <NavLink to="/statistics" style={navLinkStyle}>
+          statistics
         </NavLink>
       </div>
     </nav>
   );
 };
 
-// Same styles as before...
+// Main navigation bar container for desktop only
 const navStyle: React.CSSProperties = {
-  display: 'flex',
-  justifyContent: 'space-between',
-  alignItems: 'center',
-  padding: '1rem 2rem',
-  backgroundColor: '#222',
-  color: '#fff',
-  position: 'fixed',
-  width: '100%',
+  display: 'flex',                  // Flex layout for horizontal alignment
+  justifyContent: 'space-between', // Space between logo and links
+  alignItems: 'center',             // Vertically center items
+  padding: '2rem 3rem',             // Padding around nav
+  backgroundColor: '#222',          // Dark background
+  color: 'white',                   // White text
+  position: 'fixed',                // Fixed at top of page
+  width: '100%',                   // Full width
   top: 0,
   left: 0,
   zIndex: 1000,
-  flexWrap: 'wrap',
+  flexWrap: 'nowrap',              // No wrapping needed
 };
 
+// Logo styling
 const logoStyle: React.CSSProperties = {
   fontWeight: 'bold',
-  fontSize: '1.5rem',
+  fontSize: '3rem',
   cursor: 'pointer',
+  marginLeft: '4rem',           // Space on the left side
 };
 
-const hamburgerStyle: React.CSSProperties = {
-  display: 'flex',
-  flexDirection: 'column',
-  cursor: 'pointer',
-  gap: '5px',
-};
-
-const lineStyle: React.CSSProperties = {
-  width: '25px',
-  height: '3px',
-  backgroundColor: '#fff',
-  borderRadius: '2px',
-};
-
+// Container for nav links
 const linkContainerStyle: React.CSSProperties = {
-  display: 'flex',
-  gap: '1.5rem',
+  display: 'flex',                 // Horizontal layout for links
+  gap: '1.5rem',                  // Spacing between links
+  marginRight: '10rem',             // Space on the right side
+  fontSize: '1.5rem',          // Font size for links
 };
 
-const mobileMenuOpenStyle: React.CSSProperties = {
-  flexDirection: 'column',
-  width: '100%',
-  marginTop: '1rem',
-};
-
-const mobileMenuClosedStyle: React.CSSProperties = {
-  display: 'none',
-};
-
+// Style for each nav link
 const navLinkStyle = ({ isActive }: { isActive: boolean }): React.CSSProperties => ({
-  color: isActive ? '#1DB954' : '#fff',
+  color: isActive ? '#a0a0a0' : '#fff',  // Green highlight if active, else white
   textDecoration: 'none',
   fontWeight: isActive ? '700' : '500',
 });
+
 
 export default NavBar;
