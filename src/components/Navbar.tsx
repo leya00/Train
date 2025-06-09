@@ -32,14 +32,16 @@ const navStyle: React.CSSProperties = {
   justifyContent: 'space-between', // Space between logo and links
   alignItems: 'center',             // Vertically center items
   padding: '2rem 3rem',             // Padding around nav
-  backgroundColor: '#222',          // Dark background
-  color: 'white',                   // White text
+  backgroundColor: '#ffffff',          // background
+  color: 'black',                   //  text
   position: 'fixed',                // Fixed at top of page
   width: '100%',                   // Full width
   top: 0,
   left: 0,
   zIndex: 1000,
-  flexWrap: 'nowrap',              // No wrapping needed
+  flexWrap: 'nowrap',   
+    fontFamily: "'VT323', monospace",
+           // No wrapping needed
 };
 
 // Logo styling
@@ -48,6 +50,8 @@ const logoStyle: React.CSSProperties = {
   fontSize: '3rem',
   cursor: 'pointer',
   marginLeft: '4rem',           // Space on the left side
+    fontFamily: "'VT323', monospace",
+
 };
 
 // Container for nav links
@@ -60,7 +64,7 @@ const linkContainerStyle: React.CSSProperties = {
 
 // Style for each nav link
 const navLinkStyle = ({ isActive }: { isActive: boolean }): React.CSSProperties => ({
-  color: isActive ? '#a0a0a0' : '#fff',  // Green highlight if active, else white
+  color: isActive ? '#0a5fbf' : '#313233',  // Green highlight if active, else white
   textDecoration: 'none',
   fontWeight: isActive ? '700' : '500',
 });
