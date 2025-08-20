@@ -85,9 +85,7 @@ export default function VideoUploader() {
       setStatus('uploading');
       setUploadProgress(0);
 
-      console.log('Sending request to backend...');
-      console.log('Video file:', video.name, 'Size:', video.size);
-      console.log('Threshold:', confidenceThreshold);
+
 
       const response = await axios.post('http://localhost:8000/upload', formData, {
         headers: {
@@ -99,8 +97,7 @@ export default function VideoUploader() {
         },
       });
 
-      console.log('Response received:', response.data);
-      console.log('Schedule data:', response.data.schedule);
+
       
       // Create the detection results object with the correct structure
       const detectionResults = {
@@ -138,9 +135,7 @@ export default function VideoUploader() {
     }
   }
 
-  // Add this console log to debug the schedule data in the render
-  console.log('Current detectionResults:', detectionResults);
-  console.log('Current schedule:', schedule);
+
 
   return (
     <div className="dashboard-container">
