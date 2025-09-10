@@ -1,0 +1,54 @@
+# Python cache files
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+
+# Distribution / packaging
+dist/
+build/
+*.egg-info/
+
+# Virtual environments
+venv/
+env/
+ENV/
+yolov5-env/
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# PyTorch models (optional - uncomment if you don't want to track models)
+# *.pt
+
+# Cache files
+*.cache
+frames/video_*.cache
+
+# Logs
+logs/
+
+# Output directories (optional - uncomment if you don't want to track outputs)
+# output/
+# static/inference/
+# static/inference-results/
+
+# Media files
+*.mp4
+*.avi
+*.jpg
+*.jpeg
+*.png
+*.bmp
+*.tiff
+node_modules
+node_modules
+node_modules
+node_modules
+node_modules
+node_modules
+node_modules
+node_modules
+node_modules
+node_modules
