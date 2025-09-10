@@ -252,63 +252,65 @@ export default function VideoUploader() {
       <div className="results-section">
         <div className="schedule-results">
           <h2>Train Schedule & Detection Results</h2>
-          <table className="results-table">
-            <thead>
-              <tr>
-                <th>Train ID</th>
-                <th>Scheduled Time</th>
-                <th>Detection Status</th>
-                <th>Actual Detection Time</th>
-                <th>Time Difference</th>
-                <th>Confidence</th>
-              </tr>
-            </thead>
-            <tbody>
-              {detectionResults?.schedule ? (
-                detectionResults.schedule.map((entry, index) => {
-                  // Format the actual detection time as HH:MM:SS
-                  const actualDetectionTime = entry.detection_times && entry.detection_times.length > 0 
-                    ? new Date(entry.detection_times[0] * 1000).toISOString().substr(11, 8)
-                    : '-';
-                  
-                  // Calculate time difference in seconds with proper rounding
-                  const timeDiff = entry.detection_times && entry.detection_times.length > 0
-                    ? Math.round(Math.abs(entry.detection_times[0] - entry.expected_time))
-                    : '-';
-                  
-                  // Get confidence from the first detection
-                  const confidence = entry.detection_times && entry.detection_times.length > 0
-                    ? 'High'  // You might want to get actual confidence from backend
-                    : '-';
-                  
-                  return (
-                    <tr key={`schedule-row-${index}`} className={entry.detected ? 'detected' : 'missed'}>
-                      <td>Train {entry.train_id}</td>
-                      <td>{entry.expected_timestamp}</td>
-                      <td>
-                        <span className={`status-badge ${entry.detected ? 'detected' : 'missed'}`}>
-                          {entry.detected ? 'Detected' : 'Not Detected'}
-                        </span>
-                      </td>
-                      <td>{actualDetectionTime}</td>
-                      <td>{timeDiff !== '-' ? `${timeDiff}s` : '-'}</td>
-                      <td>
-                        {entry.detected ? (
-                          <span className={`confidence-badge ${confidence === 'High' ? 'high' : 'low'}`}>
-                            {confidence}
-                          </span>
-                        ) : '-'}
-                      </td>
-                    </tr>
-                  );
-                })
-              ) : (
+          <div className="table-container">
+            <table className="results-table">
+              <thead>
                 <tr>
-                  <td colSpan={6} className="no-data">No schedule data available</td>
+                  <th>Train ID</th>
+                  <th>Scheduled Time</th>
+                  <th>Detection Status</th>
+                  <th>Actual Detection Time</th>
+                  <th>Time Difference</th>
+                  <th>Confidence</th>
                 </tr>
-              )}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {detectionResults?.schedule ? (
+                  detectionResults.schedule.map((entry, index) => {
+                    // Format the actual detection time as HH:MM:SS
+                    const actualDetectionTime = entry.detection_times && entry.detection_times.length > 0 
+                      ? new Date(entry.detection_times[0] * 1000).toISOString().substr(11, 8)
+                      : '-';
+                    
+                    // Calculate time difference in seconds with proper rounding
+                    const timeDiff = entry.detection_times && entry.detection_times.length > 0
+                      ? Math.round(Math.abs(entry.detection_times[0] - entry.expected_time))
+                      : '-';
+                    
+                    // Get confidence from the first detection
+                    const confidence = entry.detection_times && entry.detection_times.length > 0
+                      ? 'High'  // You might want to get actual confidence from backend
+                      : '-';
+                    
+                    return (
+                      <tr key={`schedule-row-${index}`} className={entry.detected ? 'detected' : 'missed'}>
+                        <td>Train {entry.train_id}</td>
+                        <td>{entry.expected_timestamp}</td>
+                        <td>
+                          <span className={`status-badge ${entry.detected ? 'detected' : 'missed'}`}>
+                            {entry.detected ? 'Detected' : 'Not Detected'}
+                          </span>
+                        </td>
+                        <td>{actualDetectionTime}</td>
+                        <td>{timeDiff !== '-' ? `${timeDiff}s` : '-'}</td>
+                        <td>
+                          {entry.detected ? (
+                            <span className={`confidence-badge ${confidence === 'High' ? 'high' : 'low'}`}>
+                              {confidence}
+                            </span>
+                          ) : '-'}
+                        </td>
+                      </tr>
+                    );
+                  })
+                ) : (
+                  <tr>
+                    <td colSpan={6} className="no-data">No schedule data available</td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
         </div>
         
         <div className="objects-detected">
@@ -316,27 +318,29 @@ export default function VideoUploader() {
           <div className="chart-container">
             {detectionResults?.statistics?.object_counts ? (
               <>
-                <PieChart width={300} height={300}>
-                  <Pie
-                    data={Object.entries(detectionResults.statistics.object_counts).map(([name, value]) => ({
-                      name,
-                      value
-                    }))}
-                    cx="50%"
-                    cy="50%"
-                    outerRadius={100}
-                    fill="#8884d8"
-                    dataKey="value"
-                    nameKey="name"
-                    label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
-                  >
-                    {Object.entries(detectionResults.statistics.object_counts).map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                    ))}
-                  </Pie>
-                  <Tooltip />
-                  <Legend />
-                </PieChart>
+                <div className="chart-wrapper">
+                  <PieChart width={300} height={300}>
+                    <Pie
+                      data={Object.entries(detectionResults.statistics.object_counts).map(([name, value]) => ({
+                        name,
+                        value
+                      }))}
+                      cx="50%"
+                      cy="50%"
+                      outerRadius={100}
+                      fill="#8884d8"
+                      dataKey="value"
+                      nameKey="name"
+                      label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
+                    >
+                      {Object.entries(detectionResults.statistics.object_counts).map((entry, index) => (
+                        <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                      ))}
+                    </Pie>
+                    <Tooltip />
+                    <Legend />
+                  </PieChart>
+                </div>
                 <div className="object-stats">
                   <h3>Detection Breakdown</h3>
                   <ul>

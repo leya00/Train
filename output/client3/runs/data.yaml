@@ -1,0 +1,5 @@
+names:
+- object
+nc: 1
+train: C:/Users/groov/OneDrive/Desktop/Train/fed-learning2-belal-kaitlyn/output/client3/train
+val: C:/Users/groov/OneDrive/Desktop/Train/fed-learning2-belal-kaitlyn/output/client3/val
