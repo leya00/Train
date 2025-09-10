@@ -19,8 +19,8 @@ yolov5-env/
 # Jupyter Notebook
 .ipynb_checkpoints
 
-# PyTorch models (optional - uncomment if you don't want to track models)
-# *.pt
+# PyTorch models (optional)
+*.pt
 
 # Cache files
 *.cache
@@ -29,10 +29,10 @@ frames/video_*.cache
 # Logs
 logs/
 
-# Output directories (optional - uncomment if you don't want to track outputs)
-# output/
-# static/inference/
-# static/inference-results/
+# Output directories (optional)
+output/
+static/inference/
+static/inference-results/
 
 # Media files
 *.mp4
@@ -42,13 +42,6 @@ logs/
 *.png
 *.bmp
 *.tiff
-node_modules
-node_modules
-node_modules
-node_modules
-node_modules
-node_modules
-node_modules
-node_modules
-node_modules
-node_modules
+
+# Node.js
+node_modules/
