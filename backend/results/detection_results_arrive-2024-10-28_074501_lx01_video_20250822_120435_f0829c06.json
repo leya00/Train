@@ -413,8 +413,8 @@
     },
     "expected_trains": 5,
     "detected_trains": 1,
-    "detection_time_seconds": 89.45,
-    "detection_fps": 3.34
+    "detection_time_seconds": 198.95,
+    "detection_fps": 1.5
   },
   "video_path": "uploads\\arrive-2024-10-28_074501_lx01_video.mp4",
   "video_name": "arrive-2024-10-28_074501_lx01_video",
@@ -467,6 +467,6 @@
       "confidence": 0.0
     }
   ],
-  "processing_timestamp": "2025-08-24 21:30:34",
-  "unique_id": "941d6fcd-31b2-40b7-ae4f-8b8eef288cc7"
+  "processing_timestamp": "2025-08-22 12:04:35",
+  "unique_id": "f9e2a41f-fda0-45ad-acd7-69b63ed9fdeb"
 }

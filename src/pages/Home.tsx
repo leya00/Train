@@ -28,7 +28,7 @@ export default function Home() {
           </Link>
         </div>
 
-        {/* Commuter Card */}
+        {/* Commuter Card 
         <div style={cardStyle}>
           <h2 style={cardTitleStyle}>Commuter Mode</h2>
           <p style={cardTextStyle}>
@@ -41,6 +41,22 @@ export default function Home() {
             onMouseLeave={e => (e.currentTarget.style.backgroundColor = greenButtonStyle.backgroundColor)}
           >
             Enter Commuter Mode
+          </Link>
+        </div> */}
+
+        {/* Federated Learning Card */}
+        <div style={cardStyle}>
+          <h2 style={cardTitleStyle}>Federated Learning</h2>
+          <p style={cardTextStyle}>
+            Collaborate on train detection model training using privacy-preserving federated learning. Upload videos, train models, and test global aggregated results.
+          </p>
+          <Link
+            to="/federated-learning"
+            style={purpleButtonStyle}
+            onMouseEnter={e => (e.currentTarget.style.backgroundColor = hoverPurpleButtonStyle.backgroundColor)}
+            onMouseLeave={e => (e.currentTarget.style.backgroundColor = purpleButtonStyle.backgroundColor)}
+          >
+            Enter Federated Learning
           </Link>
         </div>
       </div>
@@ -148,4 +164,13 @@ const hoverBlueButtonStyle: React.CSSProperties = {
 
 const hoverGreenButtonStyle: React.CSSProperties = {
   backgroundColor: '#15803d',
+};
+
+const purpleButtonStyle: React.CSSProperties = {
+  ...buttonStyleBase,
+  backgroundColor: '#8b5cf6',
+};
+
+const hoverPurpleButtonStyle: React.CSSProperties = {
+  backgroundColor: '#7c3aed',
 };

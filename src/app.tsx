@@ -5,6 +5,7 @@ import Researcher from './pages/Researcher';
 import Commuter from './pages/Commuter';
 import CommuterSchedule from './pages/commuter_schedule';
 import ResearcherStatistics from './pages/researcher_statistics';
+import FederatedLearning from './pages/FederatedLearning';
 
 function App() {
   return (
@@ -17,6 +18,7 @@ function App() {
           <Route path="/researcher/statistics" element={<ResearcherStatistics />} />
           <Route path="/commuter" element={<Commuter />} />
           <Route path="/commuter/schedule" element={<CommuterSchedule />} />
+          <Route path="/federated-learning" element={<FederatedLearning />} />
         </Routes>
       </div>
     </>

@@ -12,15 +12,18 @@ const NavBar: React.FC = () => {
         <NavLink to="/researcher" style={navLinkStyle}>
           Researcher
         </NavLink>
-        <NavLink to="/commuter" style={navLinkStyle}>
-          Commuter
+         <NavLink to="/FederatedLearning" style={navLinkStyle}>
+          Federated Learning
+        </NavLink>
+        {/*<NavLink to="/commuter" style={navLinkStyle}>
+          Commuter 
         </NavLink>
         <NavLink to="/schedual" style={navLinkStyle}>
           schedual
         </NavLink>
         <NavLink to="/statistics" style={navLinkStyle}>
           statistics
-        </NavLink>
+        </NavLink>*/}
       </div>
     </nav>
   );
