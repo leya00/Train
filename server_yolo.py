@@ -20,16 +20,8 @@ class FedAvgWithSave(fl.server.strategy.FedAvg):
 def save_final_model(params, base_ckpt="model/my_model.pt", out_path="static/output/final_model.pt"):
     print("[SERVER] ✅ Aggregation complete, saving model...")
 
-    try:
-        # Try to load the base model with safe loading
-        base_model = YOLO(base_ckpt)
-        base_sd = base_model.model.state_dict()
-    except Exception as e:
-        print(f"[SERVER] Error loading base model: {e}")
-        print("[SERVER] Creating fallback model...")
-        # Create a fallback model if loading fails
-        base_model = YOLO('yolov8n.pt')
-        base_sd = base_model.model.state_dict()
+    base_model = YOLO(base_ckpt)
+    base_sd = base_model.model.state_dict()
 
     ndarrays = parameters_to_ndarrays(params)
     if len(ndarrays) != len(base_sd):
@@ -53,15 +45,15 @@ def save_final_model(params, base_ckpt="model/my_model.pt", out_path="static/out
 
 if __name__ == "__main__":
     strategy = FedAvgWithSave(
-        min_fit_clients=4,  # Require all 4 clients to participate
-        min_evaluate_clients=4,  # All clients must evaluate
-        min_available_clients=4,  # Wait for all 4 clients to be available
+        min_fit_clients=1,
+        min_evaluate_clients=1,
+        min_available_clients=1,
     )
 
-    # Run fewer rounds since all clients train together in each round
+    # 4 rounds = (optionally) 4 sequential clients
     fl.server.start_server(
-        server_address="localhost:8082",  # Use port 8082 to avoid conflicts
-        config=fl.server.ServerConfig(num_rounds=3),  # 3 rounds with all 4 clients
+        server_address="0.0.0.0:8080",
+        config=fl.server.ServerConfig(num_rounds=4),
         strategy=strategy,
     )
 

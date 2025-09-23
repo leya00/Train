@@ -61,8 +61,48 @@ def load_model():
     for model_path in model_paths:
         try:
             print(f"Loading model from {model_path}...")
-            # Load YOLOv5 model
-            model = torch.hub.load('ultralytics/yolov5', 'custom', path=model_path)
+            # Try loading with Ultralytics YOLO first (newer format)
+            try:
+                from ultralytics import YOLO
+                model = YOLO(model_path)
+                if model:
+                    print(f"Successfully loaded model with Ultralytics YOLO: {model_path}")
+                    return model
+            except:
+                pass
+            
+            # Try to load with torch.hub and handle the grid attribute error
+            try:
+                model = torch.hub.load('ultralytics/yolov5', 'custom', path=model_path, force_reload=True)
+            except Exception as e:
+                if "'Detect' object has no attribute 'grid'" in str(e):
+                    # Load the model without the problematic attributes
+                    import torch
+                    checkpoint = torch.load(model_path, map_location='cpu')
+                    
+                    # Fix the checkpoint before loading
+                    if 'model' in checkpoint:
+                        model_dict = checkpoint['model']
+                        for key, value in model_dict.items():
+                            if hasattr(value, '__class__') and 'Detect' in str(value.__class__):
+                                if not hasattr(value, 'grid'):
+                                    value.grid = [torch.zeros(1)] * 3
+                                if not hasattr(value, 'anchor_grid'):
+                                    value.anchor_grid = [torch.zeros(1)] * 3
+                    
+                    # Save the fixed checkpoint temporarily
+                    temp_path = model_path + '_fixed.pt'
+                    torch.save(checkpoint, temp_path)
+                    
+                    # Load the fixed model
+                    model = torch.hub.load('ultralytics/yolov5', 'custom', path=temp_path, force_reload=True)
+                    
+                    # Clean up temp file
+                    import os
+                    if os.path.exists(temp_path):
+                        os.remove(temp_path)
+                else:
+                    raise e
             if model:
                 print(f"Successfully loaded model: {model_path}")
                 return model
@@ -153,26 +193,50 @@ def run_inference(file_path, is_video=False):
                 # Run inference on frame
                 results = model(frame)
                 
-                # Get detections
-                pred = results.pred[0]
-                if pred is not None and len(pred) > 0:
-                    for *xyxy, conf, cls in pred:
-                        # Add detection to list
-                        x1, y1, x2, y2 = [int(x) for x in xyxy]
-                        confidence = float(conf)
-                        class_id = int(cls)
-                        class_name = results.names[class_id]
-                        
-                        detections.append({
-                            "frame": frame_count,
-                            "bbox": [x1, y1, x2, y2],
-                            "confidence": confidence,
-                            "class": class_id,
-                            "class_name": class_name
-                        })
+                # Handle different model formats (Ultralytics vs torch.hub)
+                if hasattr(results, 'pred'):  # torch.hub format
+                    pred = results.pred[0]
+                    names = results.names
+                    annotated_frame = results.render()[0]
+                else:  # Ultralytics format
+                    pred = results[0].boxes if len(results) > 0 and results[0].boxes is not None else None
+                    names = results[0].names if len(results) > 0 else {}
+                    annotated_frame = results[0].plot()
                 
-                # Draw results on frame
-                annotated_frame = results.render()[0]
+                # Get detections
+                if pred is not None and len(pred) > 0:
+                    if hasattr(pred, 'xyxy'):  # Ultralytics format
+                        for i in range(len(pred)):
+                            xyxy = pred.xyxy[i].cpu().numpy()
+                            conf = pred.conf[i].cpu().numpy()
+                            cls = pred.cls[i].cpu().numpy()
+                            
+                            x1, y1, x2, y2 = [int(x) for x in xyxy]
+                            confidence = float(conf)
+                            class_id = int(cls)
+                            class_name = names.get(class_id, f"class_{class_id}")
+                            
+                            detections.append({
+                                "frame": frame_count,
+                                "bbox": [x1, y1, x2, y2],
+                                "confidence": confidence,
+                                "class": class_id,
+                                "class_name": class_name
+                            })
+                    else:  # torch.hub format
+                        for *xyxy, conf, cls in pred:
+                            x1, y1, x2, y2 = [int(x) for x in xyxy]
+                            confidence = float(conf)
+                            class_id = int(cls)
+                            class_name = names[class_id]
+                            
+                            detections.append({
+                                "frame": frame_count,
+                                "bbox": [x1, y1, x2, y2],
+                                "confidence": confidence,
+                                "class": class_id,
+                                "class_name": class_name
+                            })
                 
                 # Write frame to output video
                 out.write(annotated_frame)
@@ -186,28 +250,55 @@ def run_inference(file_path, is_video=False):
             # For image
             results = model(file_path)
             
-            # Save the annotated image
-            output_filename = os.path.basename(file_path)
-            output_path = f"static/inference-results/processed_{output_filename}"
-            results.save(save_dir="static/inference-results", exist_ok=True)
+            # Handle different model formats (Ultralytics vs torch.hub)
+            if hasattr(results, 'pred'):  # torch.hub format
+                pred = results.pred[0]
+                names = results.names
+                # Save the annotated image
+                output_filename = os.path.basename(file_path)
+                output_path = f"static/inference-results/processed_{output_filename}"
+                results.save(save_dir="static/inference-results", exist_ok=True)
+            else:  # Ultralytics format
+                pred = results[0].boxes if len(results) > 0 and results[0].boxes is not None else None
+                names = results[0].names if len(results) > 0 else {}
+                # Save the annotated image
+                output_filename = os.path.basename(file_path)
+                output_path = f"static/inference-results/processed_{output_filename}"
+                results[0].save(filename=output_path)
             
             # Get detections
             detections = []
-            pred = results.pred[0]
             if pred is not None and len(pred) > 0:
-                for *xyxy, conf, cls in pred:
-                    # Add detection to list
-                    x1, y1, x2, y2 = [int(x) for x in xyxy]
-                    confidence = float(conf)
-                    class_id = int(cls)
-                    class_name = results.names[class_id]
-                    
-                    detections.append({
-                        "bbox": [x1, y1, x2, y2],
-                        "confidence": confidence,
-                        "class": class_id,
-                        "class_name": class_name
-                    })
+                if hasattr(pred, 'xyxy'):  # Ultralytics format
+                    for i in range(len(pred)):
+                        xyxy = pred.xyxy[i].cpu().numpy()
+                        conf = pred.conf[i].cpu().numpy()
+                        cls = pred.cls[i].cpu().numpy()
+                        
+                        x1, y1, x2, y2 = [int(x) for x in xyxy]
+                        confidence = float(conf)
+                        class_id = int(cls)
+                        class_name = names.get(class_id, f"class_{class_id}")
+                        
+                        detections.append({
+                            "bbox": [x1, y1, x2, y2],
+                            "confidence": confidence,
+                            "class": class_id,
+                            "class_name": class_name
+                        })
+                else:  # torch.hub format
+                    for *xyxy, conf, cls in pred:
+                        x1, y1, x2, y2 = [int(x) for x in xyxy]
+                        confidence = float(conf)
+                        class_id = int(cls)
+                        class_name = names[class_id]
+                        
+                        detections.append({
+                            "bbox": [x1, y1, x2, y2],
+                            "confidence": confidence,
+                            "class": class_id,
+                            "class_name": class_name
+                        })
         
         processing_time = time.time() - start_time
         
@@ -416,24 +507,35 @@ if __name__ == '__main__':
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Federated Learning Inference Interface</title>
+    <title>Train Detection System</title>
     <style>
         body {
-            font-family: Arial, sans-serif;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             max-width: 1200px;
             margin: 0 auto;
             padding: 20px;
-            background-color: #f5f5f5;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            line-height: 1.6;
         }
-        h1, h2, h3 {
-            color: #333;
+        h1 {
+            color: #ffffff;
+            text-align: center;
+            margin-bottom: 30px;
+            font-weight: 300;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+        h2, h3 {
+            color: #2c3e50;
+            margin-bottom: 15px;
         }
         .container {
             background-color: white;
-            padding: 20px;
-            border-radius: 5px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
             margin-bottom: 20px;
+            border: 1px solid rgba(255,255,255,0.2);
         }
         .metrics-container {
             display: flex;
@@ -441,47 +543,91 @@ if __name__ == '__main__':
             gap: 20px;
         }
         .metric-card {
-            background-color: #f9f9f9;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            padding: 15px;
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            border: none;
+            border-radius: 10px;
+            padding: 20px;
             flex: 1;
             min-width: 200px;
+            color: white;
+            box-shadow: 0 4px 15px rgba(79, 172, 254, 0.3);
+            transition: transform 0.3s ease;
+        }
+        .metric-card:hover {
+            transform: translateY(-2px);
         }
         .metric-value {
-            font-size: 24px;
+            font-size: 28px;
             font-weight: bold;
-            color: #2c3e50;
+            color: #ffffff;
+            text-shadow: 0 1px 3px rgba(0,0,0,0.3);
+        }
+        .metric-card h3 {
+            color: #ffffff;
+            margin-bottom: 10px;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
         }
         .upload-container {
-            border: 2px dashed #ccc;
-            padding: 20px;
+            border: 2px dashed #4facfe;
+            padding: 30px;
             text-align: center;
             cursor: pointer;
             margin-bottom: 20px;
+            border-radius: 10px;
+            background: linear-gradient(135deg, rgba(79, 172, 254, 0.1) 0%, rgba(0, 242, 254, 0.1) 100%);
+            transition: all 0.3s ease;
         }
         .upload-container:hover {
-            border-color: #aaa;
+            border-color: #00f2fe;
+            background: linear-gradient(135deg, rgba(79, 172, 254, 0.2) 0%, rgba(0, 242, 254, 0.2) 100%);
+            transform: translateY(-2px);
         }
         .results-container {
             margin-top: 20px;
         }
         .result-item {
-            border-bottom: 1px solid #eee;
-            padding: 10px 0;
+            border-bottom: 1px solid #e3f2fd;
+            padding: 15px 0;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            background: linear-gradient(135deg, rgba(79, 172, 254, 0.05) 0%, rgba(0, 242, 254, 0.05) 100%);
+            padding: 15px;
         }
         .result-item:last-child {
             border-bottom: none;
         }
+        button {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(79, 172, 254, 0.3);
+        }
+        button:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(79, 172, 254, 0.4);
+        }
+        button:disabled {
+            background: #bdc3c7;
+            cursor: not-allowed;
+            box-shadow: none;
+        }
         .progress-bar {
             height: 10px;
-            background-color: #e0e0e0;
+            background-color: #e3f2fd;
             border-radius: 5px;
             margin-top: 5px;
         }
         .progress-bar-fill {
             height: 100%;
-            background-color: #4CAF50;
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
             border-radius: 5px;
             transition: width 0.3s ease;
         }
@@ -490,7 +636,10 @@ if __name__ == '__main__':
         }
         .loading {
             text-align: center;
-            padding: 20px;
+            padding: 30px;
+            background: linear-gradient(135deg, rgba(79, 172, 254, 0.1) 0%, rgba(0, 242, 254, 0.1) 100%);
+            border-radius: 10px;
+            color: #2c3e50;
         }
         .video-container {
             margin-top: 10px;
@@ -501,39 +650,40 @@ if __name__ == '__main__':
         }
         .batch-metrics {
             margin-top: 20px;
-            padding: 15px;
-            background-color: #e8f5e9;
-            border-radius: 5px;
+            padding: 20px;
+            background: linear-gradient(135deg, rgba(79, 172, 254, 0.1) 0%, rgba(0, 242, 254, 0.1) 100%);
+            border-radius: 10px;
+            border-left: 4px solid #4facfe;
         }
     </style>
 </head>
 <body>
-    <h1>Federated Learning Inference Interface</h1>
+    <h1>Train CHEESE System</h1>
     
     <div class="container">
-        <h2>Model Information</h2>
+        <h2>Model Status</h2>
         <div id="model-info">Loading model information...</div>
     </div>
     
     <div class="container">
-        <h2>Run Inference</h2>
+        <h2>Upload & Process</h2>
         <div class="upload-container" id="upload-area">
             <p>Drop files here or click to upload</p>
             <p><small>Supports images (.jpg, .jpeg, .png) and videos (.mp4, .avi, .mov)</small></p>
             <input type="file" id="file-input" multiple accept=".jpg,.jpeg,.png,.mp4,.avi,.mov" style="display: none;">
         </div>
-        <button id="run-inference-btn" disabled>Run Inference</button>
+        <button id="run-inference-btn" disabled>Process Files</button>
         <div id="upload-status"></div>
     </div>
     
     <div class="container hidden" id="results-section">
-        <h2>Inference Results</h2>
+        <h2>Results</h2>
         <div class="batch-metrics" id="batch-metrics"></div>
         <div id="results-container"></div>
     </div>
     
     <div class="loading hidden" id="loading">
-        <p>Running inference...</p>
+        <p>Processing files...</p>
     </div>
 
     <script>
@@ -583,21 +733,13 @@ if __name__ == '__main__':
                 let html = `
                     <div class="metrics-container">
                         <div class="metric-card">
-                            <h3>Model Name</h3>
+                            <h3>Model</h3>
                             <div>${data.model_name}</div>
-                        </div>
-                        <div class="metric-card">
-                            <h3>Model Type</h3>
-                            <div>${data.model_type}</div>
                         </div>
                         <div class="metric-card">
                             <h3>Status</h3>
                             <div>${data.model_status}</div>
                         </div>
-                    </div>
-                    
-                    <h3>Federated Model Training Metrics</h3>
-                    <div class="metrics-container">
                         <div class="metric-card">
                             <h3>Precision</h3>
                             <div class="metric-value">${(data.federated_metrics.precision * 100).toFixed(2)}%</div>
@@ -617,26 +759,17 @@ if __name__ == '__main__':
                     </div>
                 `;
                 
-                // Add dynamic inference metrics if available
+                // Add recent processing stats if available
                 if (data.batch_metrics && data.batch_metrics.files_processed > 0) {
                     html += `
-                        <h3>Dynamic Inference Metrics</h3>
-                        <div class="metrics-container">
-                            <div class="metric-card">
-                                <h3>Precision</h3>
-                                <div class="metric-value">${(data.batch_metrics.precision * 100).toFixed(2)}%</div>
-                            </div>
-                            <div class="metric-card">
-                                <h3>Recall</h3>
-                                <div class="metric-value">${(data.batch_metrics.recall * 100).toFixed(2)}%</div>
-                            </div>
-                            <div class="metric-card">
-                                <h3>F1 Score</h3>
-                                <div class="metric-value">${(data.batch_metrics.f1_score * 100).toFixed(2)}%</div>
-                            </div>
+                        <div class="metrics-container" style="margin-top: 20px;">
                             <div class="metric-card">
                                 <h3>Files Processed</h3>
                                 <div class="metric-value">${data.batch_metrics.files_processed}</div>
+                            </div>
+                            <div class="metric-card">
+                                <h3>Total Detections</h3>
+                                <div class="metric-value">${data.batch_metrics.total_detections || 0}</div>
                             </div>
                         </div>
                     `;
@@ -704,23 +837,19 @@ if __name__ == '__main__':
             // Display batch metrics
             const batchMetrics = data.batch_metrics;
             batchMetricsEl.innerHTML = `
-                <h3>Current Batch Results</h3>
+                <h3>Processing Summary</h3>
                 <div class="metrics-container">
                     <div class="metric-card">
-                        <h3>Precision</h3>
-                        <div class="metric-value">${(batchMetrics.precision * 100).toFixed(2)}%</div>
-                    </div>
-                    <div class="metric-card">
-                        <h3>Recall</h3>
-                        <div class="metric-value">${(batchMetrics.recall * 100).toFixed(2)}%</div>
-                    </div>
-                    <div class="metric-card">
-                        <h3>F1 Score</h3>
-                        <div class="metric-value">${(batchMetrics.f1_score * 100).toFixed(2)}%</div>
+                        <h3>Files Processed</h3>
+                        <div class="metric-value">${data.results.length}</div>
                     </div>
                     <div class="metric-card">
                         <h3>Total Detections</h3>
                         <div class="metric-value">${data.total_detections}</div>
+                    </div>
+                    <div class="metric-card">
+                        <h3>Processing Time</h3>
+                        <div class="metric-value">${data.results.reduce((sum, r) => sum + r.processing_time, 0).toFixed(2)}s</div>
                     </div>
                 </div>
             `;
@@ -737,7 +866,6 @@ if __name__ == '__main__':
                     <div class="result-item">
                         <h3>${result.filename}</h3>
                         <p>Detections: ${result.detections} | Processing Time: ${result.processing_time.toFixed(2)}s</p>
-                        <p>Precision: ${(result.precision * 100).toFixed(2)}% | Recall: ${(result.recall * 100).toFixed(2)}% | F1: ${(result.f1_score * 100).toFixed(2)}%</p>
                         ${isVideo ? 
                             `<div class="video-container">
                                 <video controls>
@@ -746,7 +874,7 @@ if __name__ == '__main__':
                                 </video>
                             </div>` : 
                             `<div class="image-container">
-                                <img src="${result.output_path}" alt="Inference result" style="max-width: 100%; max-height: 400px;">
+                                <img src="${result.output_path}" alt="Detection result" style="max-width: 100%; max-height: 400px;">
                             </div>`
                         }
                     </div>
