@@ -1,0 +1,71 @@
+{
+  "train_frames": [],
+  "statistics": {
+    "total_frames": 18,
+    "frames_with_trains": 0,
+    "false_positives": 0,
+    "true_positives": 0,
+    "detection_rate": 0.0,
+    "avg_confidence": 0,
+    "precision": 0,
+    "recall": 0.0,
+    "f1_score": 0,
+    "duration_seconds": 17.1,
+    "object_counts": {},
+    "expected_trains": 5,
+    "detected_trains": 0,
+    "detection_time_seconds": 5.69,
+    "detection_fps": 3.16
+  },
+  "video_path": "uploads\\trainvideo.mp4",
+  "video_name": "trainvideo",
+  "schedule": [
+    {
+      "train_id": 1,
+      "expected_time": 2.85,
+      "expected_timestamp": "0:00:02",
+      "tolerance": 15,
+      "detected": false,
+      "detection_times": [],
+      "confidence": 0.0
+    },
+    {
+      "train_id": 2,
+      "expected_time": 5.7,
+      "expected_timestamp": "0:00:05",
+      "tolerance": 15,
+      "detected": false,
+      "detection_times": [],
+      "confidence": 0.0
+    },
+    {
+      "train_id": 3,
+      "expected_time": 8.55,
+      "expected_timestamp": "0:00:08",
+      "tolerance": 15,
+      "detected": false,
+      "detection_times": [],
+      "confidence": 0.0
+    },
+    {
+      "train_id": 4,
+      "expected_time": 11.4,
+      "expected_timestamp": "0:00:11",
+      "tolerance": 15,
+      "detected": false,
+      "detection_times": [],
+      "confidence": 0.0
+    },
+    {
+      "train_id": 5,
+      "expected_time": 14.25,
+      "expected_timestamp": "0:00:14",
+      "tolerance": 15,
+      "detected": false,
+      "detection_times": [],
+      "confidence": 0.0
+    }
+  ],
+  "processing_timestamp": "2025-08-15 11:35:28",
+  "unique_id": "4d482f69-3e1d-4a0e-91a3-6be0b2084a90"
+}

@@ -1,0 +1,472 @@
+{
+  "train_frames": [
+    {
+      "frame": "frame_0160.jpg",
+      "timestamp": "0:02:40",
+      "timestamp_seconds": 160.0,
+      "path": "C:\\Users\\groov\\OneDrive\\Desktop\\Train\\backend\\inference_results\\frame_0160.jpg",
+      "detections": [
+        {
+          "class": "train",
+          "confidence": 0.7,
+          "bbox": [
+            0.000675201416015625,
+            260.6899108886719,
+            150.99195861816406,
+            810.94140625
+          ]
+        }
+      ]
+    },
+    {
+      "frame": "frame_0161.jpg",
+      "timestamp": "0:02:41",
+      "timestamp_seconds": 161.0,
+      "path": "C:\\Users\\groov\\OneDrive\\Desktop\\Train\\backend\\inference_results\\frame_0161.jpg",
+      "detections": [
+        {
+          "class": "train",
+          "confidence": 0.82,
+          "bbox": [
+            0.5848846435546875,
+            252.67776489257812,
+            255.7726287841797,
+            787.0014038085938
+          ]
+        }
+      ]
+    },
+    {
+      "frame": "frame_0162.jpg",
+      "timestamp": "0:02:42",
+      "timestamp_seconds": 162.0,
+      "path": "C:\\Users\\groov\\OneDrive\\Desktop\\Train\\backend\\inference_results\\frame_0162.jpg",
+      "detections": [
+        {
+          "class": "train",
+          "confidence": 0.82,
+          "bbox": [
+            0.0,
+            240.90032958984375,
+            362.3690185546875,
+            779.305908203125
+          ]
+        }
+      ]
+    },
+    {
+      "frame": "frame_0163.jpg",
+      "timestamp": "0:02:43",
+      "timestamp_seconds": 163.0,
+      "path": "C:\\Users\\groov\\OneDrive\\Desktop\\Train\\backend\\inference_results\\frame_0163.jpg",
+      "detections": [
+        {
+          "class": "train",
+          "confidence": 0.91,
+          "bbox": [
+            0.42169189453125,
+            233.20001220703125,
+            476.9614562988281,
+            808.0931396484375
+          ]
+        }
+      ]
+    },
+    {
+      "frame": "frame_0164.jpg",
+      "timestamp": "0:02:44",
+      "timestamp_seconds": 164.0,
+      "path": "C:\\Users\\groov\\OneDrive\\Desktop\\Train\\backend\\inference_results\\frame_0164.jpg",
+      "detections": [
+        {
+          "class": "train",
+          "confidence": 0.9,
+          "bbox": [
+            0.301025390625,
+            219.6417999267578,
+            600.8536987304688,
+            815.773681640625
+          ]
+        }
+      ]
+    },
+    {
+      "frame": "frame_0165.jpg",
+      "timestamp": "0:02:45",
+      "timestamp_seconds": 165.0,
+      "path": "C:\\Users\\groov\\OneDrive\\Desktop\\Train\\backend\\inference_results\\frame_0165.jpg",
+      "detections": [
+        {
+          "class": "train",
+          "confidence": 0.89,
+          "bbox": [
+            0.735260009765625,
+            206.96044921875,
+            730.63134765625,
+            814.9652709960938
+          ]
+        }
+      ]
+    },
+    {
+      "frame": "frame_0166.jpg",
+      "timestamp": "0:02:46",
+      "timestamp_seconds": 166.0,
+      "path": "C:\\Users\\groov\\OneDrive\\Desktop\\Train\\backend\\inference_results\\frame_0166.jpg",
+      "detections": [
+        {
+          "class": "train",
+          "confidence": 0.94,
+          "bbox": [
+            0.61907958984375,
+            189.9521484375,
+            860.6905517578125,
+            825.6591796875
+          ]
+        }
+      ]
+    },
+    {
+      "frame": "frame_0167.jpg",
+      "timestamp": "0:02:47",
+      "timestamp_seconds": 167.0,
+      "path": "C:\\Users\\groov\\OneDrive\\Desktop\\Train\\backend\\inference_results\\frame_0167.jpg",
+      "detections": [
+        {
+          "class": "train",
+          "confidence": 0.91,
+          "bbox": [
+            1.21124267578125,
+            176.67361450195312,
+            1002.539794921875,
+            833.11181640625
+          ]
+        }
+      ]
+    },
+    {
+      "frame": "frame_0168.jpg",
+      "timestamp": "0:02:48",
+      "timestamp_seconds": 168.0,
+      "path": "C:\\Users\\groov\\OneDrive\\Desktop\\Train\\backend\\inference_results\\frame_0168.jpg",
+      "detections": [
+        {
+          "class": "train",
+          "confidence": 0.89,
+          "bbox": [
+            0.0,
+            167.0045623779297,
+            1149.552490234375,
+            851.480224609375
+          ]
+        }
+      ]
+    },
+    {
+      "frame": "frame_0169.jpg",
+      "timestamp": "0:02:49",
+      "timestamp_seconds": 169.0,
+      "path": "C:\\Users\\groov\\OneDrive\\Desktop\\Train\\backend\\inference_results\\frame_0169.jpg",
+      "detections": [
+        {
+          "class": "train",
+          "confidence": 0.89,
+          "bbox": [
+            3.20269775390625,
+            149.0540771484375,
+            1298.9776611328125,
+            872.8531494140625
+          ]
+        }
+      ]
+    },
+    {
+      "frame": "frame_0170.jpg",
+      "timestamp": "0:02:50",
+      "timestamp_seconds": 170.0,
+      "path": "C:\\Users\\groov\\OneDrive\\Desktop\\Train\\backend\\inference_results\\frame_0170.jpg",
+      "detections": [
+        {
+          "class": "train",
+          "confidence": 0.88,
+          "bbox": [
+            0.0,
+            130.2303924560547,
+            1460.9908447265625,
+            889.4599609375
+          ]
+        }
+      ]
+    },
+    {
+      "frame": "frame_0171.jpg",
+      "timestamp": "0:02:51",
+      "timestamp_seconds": 171.0,
+      "path": "C:\\Users\\groov\\OneDrive\\Desktop\\Train\\backend\\inference_results\\frame_0171.jpg",
+      "detections": [
+        {
+          "class": "train",
+          "confidence": 0.87,
+          "bbox": [
+            22.76641845703125,
+            127.9295654296875,
+            1638.4476318359375,
+            922.61279296875
+          ]
+        }
+      ]
+    },
+    {
+      "frame": "frame_0172.jpg",
+      "timestamp": "0:02:52",
+      "timestamp_seconds": 172.0,
+      "path": "C:\\Users\\groov\\OneDrive\\Desktop\\Train\\backend\\inference_results\\frame_0172.jpg",
+      "detections": [
+        {
+          "class": "train",
+          "confidence": 0.85,
+          "bbox": [
+            40.6212158203125,
+            108.93154907226562,
+            1862.3408203125,
+            952.2998657226562
+          ]
+        }
+      ]
+    },
+    {
+      "frame": "frame_0173.jpg",
+      "timestamp": "0:02:53",
+      "timestamp_seconds": 173.0,
+      "path": "C:\\Users\\groov\\OneDrive\\Desktop\\Train\\backend\\inference_results\\frame_0173.jpg",
+      "detections": [
+        {
+          "class": "train",
+          "confidence": 0.83,
+          "bbox": [
+            184.2022705078125,
+            83.0540771484375,
+            1916.5858154296875,
+            944.0311889648438
+          ]
+        }
+      ]
+    },
+    {
+      "frame": "frame_0174.jpg",
+      "timestamp": "0:02:54",
+      "timestamp_seconds": 174.0,
+      "path": "C:\\Users\\groov\\OneDrive\\Desktop\\Train\\backend\\inference_results\\frame_0174.jpg",
+      "detections": [
+        {
+          "class": "train",
+          "confidence": 0.79,
+          "bbox": [
+            207.39166259765625,
+            71.03338623046875,
+            1917.0462646484375,
+            979.970947265625
+          ]
+        }
+      ]
+    },
+    {
+      "frame": "frame_0175.jpg",
+      "timestamp": "0:02:55",
+      "timestamp_seconds": 175.0,
+      "path": "C:\\Users\\groov\\OneDrive\\Desktop\\Train\\backend\\inference_results\\frame_0175.jpg",
+      "detections": [
+        {
+          "class": "train",
+          "confidence": 0.68,
+          "bbox": [
+            503.471923828125,
+            128.04611206054688,
+            1914.793701171875,
+            991.5619506835938
+          ]
+        }
+      ]
+    },
+    {
+      "frame": "frame_0176.jpg",
+      "timestamp": "0:02:56",
+      "timestamp_seconds": 176.0,
+      "path": "C:\\Users\\groov\\OneDrive\\Desktop\\Train\\backend\\inference_results\\frame_0176.jpg",
+      "detections": [
+        {
+          "class": "train",
+          "confidence": 0.54,
+          "bbox": [
+            617.0950927734375,
+            116.28799438476562,
+            1916.9168701171875,
+            965.9188842773438
+          ]
+        }
+      ]
+    },
+    {
+      "frame": "frame_0177.jpg",
+      "timestamp": "0:02:57",
+      "timestamp_seconds": 177.0,
+      "path": "C:\\Users\\groov\\OneDrive\\Desktop\\Train\\backend\\inference_results\\frame_0177.jpg",
+      "detections": [
+        {
+          "class": "train",
+          "confidence": 0.48,
+          "bbox": [
+            741.7115478515625,
+            101.0665283203125,
+            1917.7274169921875,
+            1045.5111083984375
+          ]
+        }
+      ]
+    },
+    {
+      "frame": "frame_0178.jpg",
+      "timestamp": "0:02:58",
+      "timestamp_seconds": 178.0,
+      "path": "C:\\Users\\groov\\OneDrive\\Desktop\\Train\\backend\\inference_results\\frame_0178.jpg",
+      "detections": [
+        {
+          "class": "train",
+          "confidence": 0.87,
+          "bbox": [
+            868.8154907226562,
+            105.0263671875,
+            1918.2921142578125,
+            1013.7918090820312
+          ]
+        }
+      ]
+    },
+    {
+      "frame": "frame_0179.jpg",
+      "timestamp": "0:02:59",
+      "timestamp_seconds": 179.0,
+      "path": "C:\\Users\\groov\\OneDrive\\Desktop\\Train\\backend\\inference_results\\frame_0179.jpg",
+      "detections": [
+        {
+          "class": "train",
+          "confidence": 0.85,
+          "bbox": [
+            1008.2552490234375,
+            100.31268310546875,
+            1918.7572021484375,
+            998.2941284179688
+          ]
+        }
+      ]
+    },
+    {
+      "frame": "frame_0180.jpg",
+      "timestamp": "0:03:00",
+      "timestamp_seconds": 180.0,
+      "path": "C:\\Users\\groov\\OneDrive\\Desktop\\Train\\backend\\inference_results\\frame_0180.jpg",
+      "detections": [
+        {
+          "class": "train",
+          "confidence": 0.83,
+          "bbox": [
+            1145.8388671875,
+            102.7364501953125,
+            1919.0965576171875,
+            995.8372192382812
+          ]
+        }
+      ]
+    },
+    {
+      "frame": "frame_0181.jpg",
+      "timestamp": "0:03:01",
+      "timestamp_seconds": 181.0,
+      "path": "C:\\Users\\groov\\OneDrive\\Desktop\\Train\\backend\\inference_results\\frame_0181.jpg",
+      "detections": [
+        {
+          "class": "train",
+          "confidence": 0.85,
+          "bbox": [
+            1309.786376953125,
+            103.31204223632812,
+            1918.4564208984375,
+            982.083251953125
+          ]
+        }
+      ]
+    }
+  ],
+  "statistics": {
+    "total_frames": 299,
+    "frames_with_trains": 22,
+    "false_positives": 5,
+    "true_positives": 17,
+    "detection_rate": 7.36,
+    "avg_confidence": 0.82,
+    "precision": 0.77,
+    "recall": 0.2,
+    "f1_score": 0.32,
+    "duration_seconds": 298.84,
+    "object_counts": {
+      "train": 22
+    },
+    "expected_trains": 5,
+    "detected_trains": 1,
+    "detection_time_seconds": 155.34,
+    "detection_fps": 1.92
+  },
+  "video_path": "uploads\\arrive-2024-10-28_074501_lx01_video.mp4",
+  "video_name": "arrive-2024-10-28_074501_lx01_video",
+  "schedule": [
+    {
+      "train_id": 1,
+      "expected_time": 49.806666666666665,
+      "expected_timestamp": "0:00:49",
+      "tolerance": 15,
+      "detected": false,
+      "detection_times": [],
+      "confidence": 0.0
+    },
+    {
+      "train_id": 2,
+      "expected_time": 99.61333333333333,
+      "expected_timestamp": "0:01:39",
+      "tolerance": 15,
+      "detected": false,
+      "detection_times": [],
+      "confidence": 0.0
+    },
+    {
+      "train_id": 3,
+      "expected_time": 149.42,
+      "expected_timestamp": "0:02:29",
+      "tolerance": 15,
+      "detected": true,
+      "detection_times": [
+        161.0
+      ],
+      "confidence": 0.82
+    },
+    {
+      "train_id": 4,
+      "expected_time": 199.22666666666666,
+      "expected_timestamp": "0:03:19",
+      "tolerance": 15,
+      "detected": false,
+      "detection_times": [],
+      "confidence": 0.0
+    },
+    {
+      "train_id": 5,
+      "expected_time": 249.03333333333333,
+      "expected_timestamp": "0:04:09",
+      "tolerance": 15,
+      "detected": false,
+      "detection_times": [],
+      "confidence": 0.0
+    }
+  ],
+  "processing_timestamp": "2025-09-12 12:12:35",
+  "unique_id": "65bcbced-df01-43ad-96f1-21a1059f1430"
+}
