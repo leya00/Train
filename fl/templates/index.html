@@ -191,6 +191,11 @@
 <body>
     <h1>Federated Learning Inference Interface</h1>
     
+    <div class="nav-container" style="display: flex; justify-content: center; margin-bottom: 20px;">
+        <a href="/" class="nav-link active" style="background-color: white; color: #216097; padding: 10px 20px; margin: 0 10px; border-radius: 25px; text-decoration: none; font-weight: 500; transition: all 0.3s ease;">Home</a>
+        <a href="/federated-training" class="nav-link" style="background-color: rgba(255, 255, 255, 0.2); color: white; padding: 10px 20px; margin: 0 10px; border-radius: 25px; text-decoration: none; font-weight: 500; transition: all 0.3s ease;">Federated Training</a>
+    </div>
+    
     <div class="container">
         <h2>Model Status</h2>
         <div id="model-info">Loading model information...</div>
@@ -198,6 +203,14 @@
     
     <div class="container">
         <h2>Upload & Process</h2>
+        
+        <div class="model-selector" style="margin-bottom: 20px; padding: 15px; background: linear-gradient(135deg, rgba(79, 172, 254, 0.1) 0%, rgba(0, 242, 254, 0.1) 100%); border-radius: 10px; border-left: 4px solid #216097;">
+            <h3>Select Model</h3>
+            <select id="model-select" style="width: 100%; padding: 12px; border: 1px solid #e3f2fd; border-radius: 8px; font-size: 16px; margin-top: 10px; transition: all 0.3s ease;">
+                <option value="">Loading models...</option>
+            </select>
+        </div>
+        
         <div class="upload-container" id="upload-area">
             <p>Drop files here or click to upload</p>
             <p><small>Supports images (.jpg, .jpeg, .png) and videos (.mp4, .avi, .mov)</small></p>
@@ -220,6 +233,7 @@
     <script>
         // DOM elements
         const modelInfoEl = document.getElementById('model-info');
+        const modelSelect = document.getElementById('model-select');
         const uploadArea = document.getElementById('upload-area');
         const fileInput = document.getElementById('file-input');
         const runInferenceBtn = document.getElementById('run-inference-btn');
@@ -232,8 +246,11 @@
         // Selected files
         let selectedFiles = [];
         
-        // Load model info when page loads
-        window.addEventListener('DOMContentLoaded', loadModelInfo);
+        // Load model info and models when page loads
+        window.addEventListener('DOMContentLoaded', () => {
+            loadModelInfo();
+            loadModels();
+        });
         
         // Set up file upload handlers
         uploadArea.addEventListener('click', () => fileInput.click());
@@ -261,7 +278,7 @@
                 const data = await response.json();
                 
                 // Create HTML for model info
-                let html = `
+              /*  let html = `
                     <div class="metrics-container">
                         <div class="metric-card">
                             <h3>Model Name</h3>
@@ -308,12 +325,56 @@
                             <div>${data.federated_metrics.last_update || 'Never'}</div>
                         </div>
                     </div>
-                `;
+                `; */
                 
                
                 modelInfoEl.innerHTML = html;
             } catch (error) {
                 modelInfoEl.innerHTML = `<p>Error loading model info: ${error.message}</p>`;
+            }
+        }
+        
+        // Function to load available models
+        async function loadModels() {
+            try {
+                const response = await fetch('/models');
+                
+                if (!response.ok) {
+                    throw new Error(`Server returned ${response.status}: ${response.statusText}`);
+                }
+                
+                const data = await response.json();
+                
+                if (data.models && data.models.length > 0) {
+                    // Clear loading option
+                    modelSelect.innerHTML = '';
+                    
+                    // Add models to select
+                    data.models.forEach(model => {
+                        const option = document.createElement('option');
+                        option.value = model.file;
+                        option.textContent = model.name;
+                        modelSelect.appendChild(option);
+                    });
+                    
+                    // Enable run button if files are selected
+                    if (selectedFiles.length > 0) {
+                        runInferenceBtn.disabled = false;
+                    }
+                    
+                    // Check for previously selected model
+                    const previousModel = localStorage.getItem('selectedModel');
+                    if (previousModel) {
+                        if (modelSelect.querySelector(`option[value="${previousModel}"]`)) {
+                            modelSelect.value = previousModel;
+                        }
+                    }
+                } else {
+                    modelSelect.innerHTML = '<option value="">No models available</option>';
+                }
+            } catch (error) {
+                console.error('Error loading models:', error);
+                modelSelect.innerHTML = '<option value="">Error loading models</option>';
             }
         }
         
@@ -324,8 +385,19 @@
             
             selectedFiles = Array.from(files);
             uploadStatus.innerHTML = `Selected ${selectedFiles.length} file(s)`;
-            runInferenceBtn.disabled = false;
+            
+            // Enable run button if a model is selected
+            runInferenceBtn.disabled = modelSelect.value === '';
         }
+        
+        // Model select change handler
+        modelSelect.addEventListener('change', () => {
+            // Store the selected model in localStorage for persistence
+            localStorage.setItem('selectedModel', modelSelect.value);
+            
+            // Enable run button if files are selected
+            runInferenceBtn.disabled = selectedFiles.length === 0;
+        });
         
         // Function to run inference
         async function runInference() {
@@ -341,6 +413,11 @@
             selectedFiles.forEach(file => {
                 formData.append('files', file);
             });
+            
+            // Add selected model if available
+            if (modelSelect.value) {
+                formData.append('model', modelSelect.value);
+            }
             
             try {
                 // Send request
@@ -375,6 +452,10 @@
             batchMetricsEl.innerHTML = `
                 <h3>Results</h3>
                 <div class="metrics-container">
+                    <div class="metric-card">
+                        <h3>Model Used</h3>
+                        <div>${data.model_info ? data.model_info.name : 'Default'}</div>
+                    </div>
                     <div class="metric-card">
                         <h3>Precision</h3>
                         <div class="metric-value">${(batchMetrics.precision * 100).toFixed(2)}%</div>

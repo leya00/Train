@@ -3,6 +3,7 @@ import requests
 import hashlib
 import json
 import time
+import shutil
 from datetime import datetime, timedelta
 from pathlib import Path
 import torch
@@ -18,10 +19,15 @@ class ModelManager:
     Manages model loading from GitHub and local sources with caching and version checking
     """
     
-    def __init__(self, cache_dir="model_cache", config_file="model_config.json"):
+    def __init__(self, cache_dir="model_cache", config_file="model_config.json", models_dir="models"):
         self.cache_dir = Path(cache_dir)
         self.config_file = Path(config_file)
+        self.models_dir = Path(models_dir)
+        self.registry_file = self.models_dir / "registry.json"
+        
+        # Create necessary directories
         self.cache_dir.mkdir(exist_ok=True)
+        self.models_dir.mkdir(exist_ok=True)
         
         # GitHub repository configuration
         self.github_repo = "KaitlynKK/fed-learning7-belalandkaitlyn"
@@ -393,3 +399,157 @@ class ModelManager:
                 cache_info["total_size"] += stat.st_size
         
         return cache_info
+        
+    def _load_model_registry(self):
+        """Load the model registry from file"""
+        if not self.registry_file.exists():
+            return {
+                "models": [
+                    {
+                        "name": "default_model",
+                        "file": "default_model.pt",
+                        "created_at": datetime.now().isoformat()
+                    }
+                ],
+                "last_updated": datetime.now().isoformat()
+            }
+        
+        try:
+            with open(self.registry_file, 'r') as f:
+                return json.load(f)
+        except Exception as e:
+            logger.error(f"Failed to load model registry: {e}")
+            return {
+                "models": [],
+                "last_updated": datetime.now().isoformat()
+            }
+    
+    def _save_model_registry(self, registry):
+        """Save the model registry to file"""
+        try:
+            with open(self.registry_file, 'w') as f:
+                json.dump(registry, f, indent=2)
+        except Exception as e:
+            logger.error(f"Failed to save model registry: {e}")
+    
+    def save_model(self, model, model_name):
+        """
+        Save a model with a custom name
+        
+        Args:
+            model: The model object to save
+            model_name: The name to give the model
+        
+        Returns:
+            dict: Information about the saved model
+        """
+        # Sanitize model name for filename
+        safe_name = "".join(c if c.isalnum() or c in ['-', '_'] else '_' for c in model_name)
+        if not safe_name:
+            safe_name = "unnamed_model"
+        
+        # Create filename with .pt extension
+        if not safe_name.endswith('.pt'):
+            filename = f"{safe_name}.pt"
+        else:
+            filename = safe_name
+        
+        # Full path to save the model
+        model_path = self.models_dir / filename
+        
+        try:
+            # Save the model
+            model.save(model_path)
+            logger.info(f"Model saved successfully to {model_path}")
+            
+            # Update the registry
+            registry = self._load_model_registry()
+            
+            # Check if model with this name already exists
+            existing_model = next((m for m in registry["models"] if m["name"] == model_name), None)
+            
+            if existing_model:
+                # Update existing entry
+                existing_model["file"] = filename
+                existing_model["updated_at"] = datetime.now().isoformat()
+            else:
+                # Add new entry
+                registry["models"].append({
+                    "name": model_name,
+                    "file": filename,
+                    "created_at": datetime.now().isoformat()
+                })
+            
+            registry["last_updated"] = datetime.now().isoformat()
+            self._save_model_registry(registry)
+            
+            return {
+                "name": model_name,
+                "file": filename,
+                "path": str(model_path),
+                "saved_at": datetime.now().isoformat()
+            }
+            
+        except Exception as e:
+            logger.error(f"Failed to save model {model_name}: {e}")
+            return None
+    
+    def list_saved_models(self):
+        """
+        List all saved models from the registry
+        
+        Returns:
+            list: List of saved models
+        """
+        registry = self._load_model_registry()
+        return registry["models"]
+    
+    def load_saved_model(self, model_name=None, model_file=None):
+        """
+        Load a saved model by name or filename
+        
+        Args:
+            model_name: Name of the model to load
+            model_file: Filename of the model to load
+            
+        Returns:
+            tuple: (model, model_type)
+        """
+        registry = self._load_model_registry()
+        
+        # Find the model in the registry
+        if model_name:
+            model_entry = next((m for m in registry["models"] if m["name"] == model_name), None)
+        elif model_file:
+            model_entry = next((m for m in registry["models"] if m["file"] == model_file), None)
+        else:
+            # Default to the first model in the registry
+            model_entry = registry["models"][0] if registry["models"] else None
+        
+        if not model_entry:
+            logger.error(f"Model not found: {model_name or model_file}")
+            return None, None
+        
+        # Full path to the model file
+        model_path = str(self.models_dir / model_entry["file"])
+        
+        if not os.path.exists(model_path):
+            logger.error(f"Model file not found: {model_path}")
+            return None, None
+        
+        # Load the model
+        model, model_type = self._load_yolo_model(model_path)
+        
+        if model is not None:
+            self.current_model = model
+            self.model_info = {
+                "source": "saved",
+                "name": model_entry["name"],
+                "file": model_entry["file"],
+                "model_type": model_type,
+                "model_path": model_path,
+                "loaded_at": datetime.now().isoformat()
+            }
+            logger.info(f"Saved model loaded successfully: {model_entry['name']}")
+        
+        return model, model_type

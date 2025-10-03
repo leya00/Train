@@ -1,0 +1,4 @@
+train: C:/Users/groov/OneDrive/Desktop/Train/fl/training/client_1/train
+val: C:/Users/groov/OneDrive/Desktop/Train/fl/training/client_1/val
+nc: 1
+names: ['object']

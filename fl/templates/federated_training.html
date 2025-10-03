@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Federated Training - Train NO System</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            line-height: 1.6;
+        }
+        h1 {
+            color: #ffffff;
+            text-align: center;
+            margin-bottom: 30px;
+            font-weight: 300;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+        h2, h3 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+        }
+        .container {
+            background-color: white;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+        .metrics-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+        .metric-card {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            border: none;
+            border-radius: 10px;
+            padding: 20px;
+            flex: 1;
+            min-width: 200px;
+            color: white;
+            box-shadow: 0 4px 15px rgba(79, 172, 254, 0.3);
+            transition: transform 0.3s ease;
+        }
+        .metric-card:hover {
+            transform: translateY(-2px);
+        }
+        .metric-value {
+            font-size: 28px;
+            font-weight: bold;
+            color: #ffffff;
+            text-shadow: 0 1px 3px rgba(0,0,0,0.3);
+        }
+        .metric-card h3 {
+            color: #ffffff;
+            margin-bottom: 10px;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        button {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(79, 172, 254, 0.3);
+        }
+        button:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(79, 172, 254, 0.4);
+        }
+        button:disabled {
+            background: #bdc3c7;
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+        .progress-bar {
+            height: 10px;
+            background-color: #e3f2fd;
+            border-radius: 5px;
+            margin-top: 5px;
+        }
+        .progress-bar-fill {
+            height: 100%;
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            border-radius: 5px;
+            transition: width 0.3s ease;
+        }
+        .hidden {
+            display: none;
+        }
+        .loading {
+            text-align: center;
+            padding: 30px;
+            background: linear-gradient(135deg, rgba(79, 172, 254, 0.1) 0%, rgba(0, 242, 254, 0.1) 100%);
+            border-radius: 10px;
+            color: #2c3e50;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #2c3e50;
+        }
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #e3f2fd;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+        .form-group input:focus, .form-group select:focus {
+            border-color: #4facfe;
+            box-shadow: 0 0 0 2px rgba(79, 172, 254, 0.2);
+            outline: none;
+        }
+        .form-group .required::after {
+            content: " *";
+            color: #e74c3c;
+        }
+        .form-error {
+            color: #e74c3c;
+            font-size: 14px;
+            margin-top: 5px;
+        }
+        .form-hint {
+            color: #7f8c8d;
+            font-size: 14px;
+            margin-top: 5px;
+            font-style: italic;
+        }
+        .nav-container {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+        .nav-link {
+            background-color: rgba(255, 255, 255, 0.2);
+            color: white;
+            padding: 10px 20px;
+            margin: 0 10px;
+            border-radius: 25px;
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+        .nav-link:hover {
+            background-color: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+        }
+        .nav-link.active {
+            background-color: white;
+            color: #4facfe;
+        }
+        .status-message {
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 20px;
+            font-weight: 500;
+        }
+        .status-success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .status-error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .status-info {
+            background-color: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+        .status-warning {
+            background-color: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeeba;
+        }
+    </style>
+</head>
+<body>
+    <h1>Federated Training</h1>
+    
+    <div class="nav-container">
+        <a href="/" class="nav-link">Home</a>
+        <a href="/federated-training" class="nav-link active">Federated Training</a>
+    </div>
+    
+    <div class="container">
+        <h2>Training Configuration</h2>
+        <form id="training-form">
+            <div class="form-group">
+                <label for="model-name" class="required">Model Name</label>
+                <input type="text" id="model-name" name="modelName" required placeholder="Enter a name for your model">
+                <div class="form-error hidden" id="model-name-error">Model name is required</div>
+            </div>
+            
+            <div class="form-group">
+                <label for="num-clients" class="required">Number of Clients</label>
+                <input type="number" id="num-clients" name="clients" required min="1" max="100" value="10">
+            </div>
+            
+            <div class="form-group">
+                <label for="num-epochs" class="required">Number of Epochs per Client</label>
+                <input type="number" id="num-epochs" name="epochs" required min="1" max="20" value="3">
+                <div class="form-hint">Recommended: 3-5 epochs. Higher values will increase training time significantly.</div>
+            </div>
+            
+            <div class="form-group">
+                <label for="num-rounds" class="required">Number of Rounds</label>
+                <input type="number" id="num-rounds" name="rounds" required min="1" max="10" value="3">
+                <div class="form-hint">Recommended: 3-5 rounds. Each round trains all clients once.</div>
+            </div>
+            
+            <button type="submit" id="start-training-btn">Start Training</button>
+        </form>
+    </div>
+    
+    <div class="container hidden" id="training-status-container">
+        <h2>Training Status</h2>
+        <div id="training-metrics" class="metrics-container">
+            <!-- Training metrics will be displayed here -->
+        </div>
+        
+        <div class="progress-container" style="margin-top: 20px;">
+            <div style="display: flex; justify-content: space-between;">
+                <span>Progress:</span>
+                <span id="progress-text">0%</span>
+            </div>
+            <div class="progress-bar">
+                <div class="progress-bar-fill" id="progress-bar-fill" style="width: 0%;"></div>
+            </div>
+        </div>
+        
+        <div id="status-message" class="status-message status-info hidden"></div>
+        
+        <div class="training-output-container" style="margin-top: 20px;">
+            <h3>Training Output</h3>
+            <div id="training-output" style="background-color: #f8f9fa; padding: 15px; border-radius: 8px; max-height: 300px; overflow-y: auto; font-family: monospace; white-space: pre-wrap; font-size: 14px; color: #333; border: 1px solid #e3e3e3;">
+                Waiting for training output...
+            </div>
+        </div>
+    </div>
+    
+    <div class="loading hidden" id="loading">
+        <p>Initializing training...</p>
+    </div>
+
+    <script>
+        // DOM elements
+        const trainingForm = document.getElementById('training-form');
+        const modelNameInput = document.getElementById('model-name');
+        const modelNameError = document.getElementById('model-name-error');
+        const startTrainingBtn = document.getElementById('start-training-btn');
+        const trainingStatusContainer = document.getElementById('training-status-container');
+        const trainingMetrics = document.getElementById('training-metrics');
+        const progressBarFill = document.getElementById('progress-bar-fill');
+        const progressText = document.getElementById('progress-text');
+        const statusMessage = document.getElementById('status-message');
+        const loadingEl = document.getElementById('loading');
+        
+        // Training state
+        let trainingInProgress = false;
+        let trainingInterval = null;
+        
+        // Form validation
+        modelNameInput.addEventListener('input', () => {
+            if (modelNameInput.value.trim() === '') {
+                modelNameError.classList.remove('hidden');
+            } else {
+                modelNameError.classList.add('hidden');
+            }
+        });
+        
+        // Form submission
+        trainingForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            // Validate model name
+            if (modelNameInput.value.trim() === '') {
+                modelNameError.classList.remove('hidden');
+                return;
+            }
+            
+            // Show loading
+            loadingEl.classList.remove('hidden');
+            startTrainingBtn.disabled = true;
+            
+            // Get form data
+            const formData = new FormData(trainingForm);
+            const trainingConfig = Object.fromEntries(formData.entries());
+            
+            try {
+                // Send training request
+                const response = await fetch('/start-federated-training', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(trainingConfig),
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`Server returned ${response.status}: ${response.statusText}`);
+                }
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    // Show training status
+                    trainingStatusContainer.classList.remove('hidden');
+                    loadingEl.classList.add('hidden');
+                    
+                    // Start monitoring training progress
+                    trainingInProgress = true;
+                    startTrainingMonitoring();
+                    
+                    // Show initial status message
+                    showStatusMessage('Training started successfully. This may take some time.', 'info');
+                } else {
+                    throw new Error(data.message || 'Failed to start training');
+                }
+                
+            } catch (error) {
+                loadingEl.classList.add('hidden');
+                startTrainingBtn.disabled = false;
+                showStatusMessage(`Error: ${error.message}`, 'error');
+            }
+        });
+        
+        // Function to start monitoring training progress
+        function startTrainingMonitoring() {
+            // Clear any existing interval
+            if (trainingInterval) {
+                clearInterval(trainingInterval);
+            }
+            
+            // Update immediately
+            updateTrainingStatus();
+            
+            // Then update every 5 seconds
+            trainingInterval = setInterval(updateTrainingStatus, 5000);
+        }
+        
+        // Function to update training status
+        async function updateTrainingStatus() {
+            try {
+                const response = await fetch('/federated-training-status');
+                
+                if (!response.ok) {
+                    throw new Error(`Server returned ${response.status}: ${response.statusText}`);
+                }
+                
+                const data = await response.json();
+                
+                // Update metrics display
+                updateMetricsDisplay(data);
+                
+                // Update progress bar
+                const progress = (data.epochs / data.total_rounds) * 100;
+                progressBarFill.style.width = `${progress}%`;
+                progressText.textContent = `${Math.round(progress)}% (${data.epochs}/${data.total_rounds})`;
+                
+                // Update training output
+                if (data.training_output && data.training_output.length > 0) {
+                    const trainingOutputEl = document.getElementById('training-output');
+                    trainingOutputEl.innerHTML = data.training_output.join('\n');
+                    
+                    // Auto-scroll to bottom
+                    trainingOutputEl.scrollTop = trainingOutputEl.scrollHeight;
+                }
+                
+                // Check if training is complete
+                if (data.training_status === 'Completed' || data.epochs >= data.total_rounds) {
+                    clearInterval(trainingInterval);
+                    trainingInProgress = false;
+                    startTrainingBtn.disabled = false;
+                    
+                    // Show completion message
+                    showStatusMessage(`Training complete. Model "${modelNameInput.value}" has been saved.`, 'success');
+                } else if (data.training_status === 'Failed') {
+                    clearInterval(trainingInterval);
+                    trainingInProgress = false;
+                    startTrainingBtn.disabled = false;
+                    
+                    // Show error message
+                    showStatusMessage('Training failed. Please check the logs for details.', 'error');
+                }
+                
+            } catch (error) {
+                console.error('Error updating training status:', error);
+            }
+        }
+        
+        // Function to update metrics display
+        function updateMetricsDisplay(data) {
+            const metrics = [
+                { name: 'Precision', value: (data.precision * 100).toFixed(2) + '%' },
+                { name: 'Recall', value: (data.recall * 100).toFixed(2) + '%' },
+                { name: 'mAP@50', value: (data.mAP50 * 100).toFixed(2) + '%' },
+                { name: 'mAP@50-95', value: (data.mAP50_95 * 100).toFixed(2) + '%' },
+                { name: 'Box Loss', value: data.box_loss.toFixed(4) },
+                { name: 'Status', value: data.training_status }
+            ];
+            
+            let metricsHtml = '';
+            metrics.forEach(metric => {
+                metricsHtml += `
+                    <div class="metric-card">
+                        <h3>${metric.name}</h3>
+                        <div class="metric-value">${metric.value}</div>
+                    </div>
+                `;
+            });
+            
+            trainingMetrics.innerHTML = metricsHtml;
+        }
+        
+        // Function to show status messages
+        function showStatusMessage(message, type = 'info') {
+            statusMessage.textContent = message;
+            statusMessage.className = `status-message status-${type}`;
+            statusMessage.classList.remove('hidden');
+            
+            // Auto-hide info messages after 5 seconds
+            if (type === 'info') {
+                setTimeout(() => {
+                    statusMessage.classList.add('hidden');
+                }, 5000);
+            }
+        }
+        
+        // Check for existing training status on page load
+        window.addEventListener('DOMContentLoaded', async () => {
+            try {
+                const response = await fetch('/federated-training-status');
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    
+                    if (data.training_status !== 'Not Started' && data.epochs > 0) {
+                        // Show training status
+                        trainingStatusContainer.classList.remove('hidden');
+                        
+                        // Update metrics display
+                        updateMetricsDisplay(data);
+                        
+                        // Update progress bar
+                        const progress = (data.epochs / data.total_rounds) * 100;
+                        progressBarFill.style.width = `${progress}%`;
+                        progressText.textContent = `${Math.round(progress)}% (${data.epochs}/${data.total_rounds})`;
+                        
+                        // Check if training is in progress
+                        if (data.training_status !== 'Completed' && data.epochs < data.total_rounds) {
+                            trainingInProgress = true;
+                            startTrainingBtn.disabled = true;
+                            startTrainingMonitoring();
+                        }
+                    }
+                }
+            } catch (error) {
+                console.error('Error checking training status:', error);
+            }
+        });
+    </script>
+</body>
+</html>

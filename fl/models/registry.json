@@ -1,0 +1,36 @@
+{
+  "models": [
+    {
+      "name": "default_model",
+      "file": "default_model.pt",
+      "created_at": "2025-10-02T00:00:00Z",
+      "updated_at": "2025-10-02T23:18:59.057603"
+    },
+    {
+      "name": "test1",
+      "file": "test1.pt",
+      "created_at": "2025-10-02T23:19:29.364103"
+    },
+    {
+      "name": "test2",
+      "file": "test2.pt",
+      "created_at": "2025-10-03T00:02:38.073062"
+    },
+    {
+      "name": "test3",
+      "file": "test3.pt",
+      "created_at": "2025-10-03T00:09:11.385918"
+    },
+    {
+      "name": "test4",
+      "file": "test4.pt",
+      "created_at": "2025-10-03T00:18:49.621771"
+    },
+    {
+      "name": "test5",
+      "file": "test5.pt",
+      "created_at": "2025-10-03T00:58:27.861413"
+    }
+  ],
+  "last_updated": "2025-10-03T00:58:27.861413"
+}
