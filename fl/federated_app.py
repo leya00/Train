@@ -1,14 +1,9 @@
 import os
 import cv2
-import sys
-import glob
-import subprocess
-import threading
 from flask import Flask, request, jsonify, render_template, send_from_directory
 from flask_cors import CORS
 from pathlib import Path
 import time
-from datetime import datetime
 from collections import defaultdict
 import torch
 import requests
@@ -40,18 +35,6 @@ inference_metrics = {
 # Create necessary directories
 os.makedirs("static/uploads", exist_ok=True)
 os.makedirs("static/inference-results", exist_ok=True)
-os.makedirs("fl/models", exist_ok=True)
-os.makedirs("fl/training", exist_ok=True)
-
-# Define base paths
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-ROOT_DIR = os.path.dirname(BASE_DIR)
-TRAIN_SCRIPT = os.path.join(ROOT_DIR, "train_standalone.py")
-
-# Training process variables
-training_process = None
-training_lock = threading.Lock()
-training_output = []
 
 def initialize_metrics():
     """Reset metrics for each inference run"""
@@ -93,11 +76,10 @@ current_fl_metrics = {
     "dfl_loss": 1.0,
     "epochs": 0,
     "total_rounds": 100,
-    "clients_connected": 0,
+    #"clients_connected": 0,
     "training_status": "Not Started",
     "last_update": "Never",
-    "inference_count": 0,
-    "model_name": "default_model"
+    "inference_count": 0
 }
 
 def update_federated_metrics_after_inference(result):
@@ -107,15 +89,16 @@ def update_federated_metrics_after_inference(result):
     # Increment inference count
     current_fl_metrics["inference_count"] += 1
     
-    # Extract metrics from the inference result
+    # Extract REAL metrics from the inference result
     detections = result.get("detections", [])
     precision = result.get("precision", 0.0)
     recall = result.get("recall", 0.0)
     f1_score = result.get("f1_score", 0.0)
     avg_confidence = result.get("avg_confidence", 0.0)
     
-    # Update metrics from this inference
+    # Update with REAL metrics from this inference
     if len(detections) > 0:
+        # Use actual precision/recall from the model
         current_fl_metrics["precision"] = precision
         current_fl_metrics["recall"] = recall
         current_fl_metrics["mAP50"] = f1_score  # Use F1 as mAP50 approximation
@@ -144,287 +127,18 @@ def update_federated_metrics_after_inference(result):
     from datetime import datetime
     current_fl_metrics["last_update"] = datetime.now().strftime("%H:%M:%S")
     
-    # Update round based on performance
+    # Update round based on actual performance
     if f1_score > 0.7:
         current_fl_metrics["epochs"] = min(current_fl_metrics["total_rounds"], 
                                          current_fl_metrics["epochs"] + 1)
     
-    # # Update clients connected (simulate active learning)
-    # if current_fl_metrics["inference_count"] > 0:
-    #     current_fl_metrics["clients_connected"] = min(10, current_fl_metrics["inference_count"] // 5)
-
-def run_training(model_name, epochs, rounds, clients):
-    """Run actual training using standalone training script"""
-    global current_fl_metrics, training_output, training_process
-    
-    # Reset training output
-    with training_lock:
-        training_output = []
-        
-    # Add initial log message
-    print(f"Starting federated training with {rounds} rounds, {epochs} epochs per client, {clients} clients")
-    with training_lock:
-        training_output.append(f"Starting federated training with {rounds} rounds, {epochs} epochs per client, {clients} clients")
-    
-    # Prepare directories
-    models_dir = os.path.join(BASE_DIR, "models")
-    os.makedirs(models_dir, exist_ok=True)
-    
-    model_path = os.path.join(models_dir, f"{model_name}.pt")
-    training_dir = os.path.join(BASE_DIR, "training")
-    os.makedirs(training_dir, exist_ok=True)
-    
-    # Log paths for debugging
-    print(f"Base dir: {BASE_DIR}")
-    print(f"Root dir: {ROOT_DIR}")
-    print(f"Training script: {TRAIN_SCRIPT}")
-    print(f"Model path: {model_path}")
-    print(f"Training dir: {training_dir}")
-    
-    # Prepare base model - copy the current model to use as starting point
-    if model is not None:
-        try:
-            # Save current model as starting point
-            model.save(model_path)
-            print(f"Saved base model to {model_path}")
-        except Exception as e:
-            print(f"Error saving base model: {e}")
-            return False
-    
-    # Client data directories
-    client_dirs = [
-        "data/labelfront1",
-        "data/labelfront2",
-        "data/labelback1",
-        "data/labelback2"
-    ]
-    
-    # Limit to the number of clients requested
-    client_dirs = client_dirs[:clients]
-    
-    # Create client output directories
-    client_output_dirs = []
-    for i, client_dir in enumerate(client_dirs):
-        client_output = os.path.join(training_dir, f"client_{i+1}")
-        os.makedirs(client_output, exist_ok=True)
-        client_output_dirs.append(client_output)
-    
-    # Function to run in a thread
-    def run_training_process():
-        global current_fl_metrics, training_output
-        
-        try:
-            # Run for the specified number of rounds
-            for round_num in range(1, rounds + 1):
-                print(f"Starting round {round_num}/{rounds}")
-                
-                # Update metrics
-                with training_lock:
-                    current_fl_metrics["epochs"] = round_num
-                    current_fl_metrics["training_status"] = f"Round {round_num}/{rounds} in progress"
-                    current_fl_metrics["last_update"] = datetime.now().strftime("%H:%M:%S")
-                    training_output.append(f"Starting round {round_num}/{rounds}")
-                
-                # Run each client
-                for client_idx, (client_dir, output_dir) in enumerate(zip(client_dirs, client_output_dirs)):
-                    client_name = f"client_{client_idx+1}"
-                    print(f"Training {client_name} with {client_dir}")
-                    
-                    # Update metrics
-                    with training_lock:
-                        current_fl_metrics["clients_connected"] = client_idx + 1
-                        training_output.append(f"Training {client_name} with {client_dir}")
-                    
-                    # Build command
-                    cmd = [
-                        sys.executable,
-                        TRAIN_SCRIPT,
-                        "--model", model_path,
-                        "--labeled_dir", os.path.join(ROOT_DIR, client_dir),
-                        "--work_root", output_dir,
-                        "--epochs", str(epochs),
-                        "--nc", "1",
-                        "--names", "object"
-                    ]
-                    
-                    # Run the command
-                    try:
-                        # Use bytes mode and handle encoding explicitly to avoid character encoding issues
-                        process = subprocess.Popen(
-                            cmd,
-                            stdout=subprocess.PIPE,
-                            stderr=subprocess.STDOUT,
-                            bufsize=1,
-                            text=False  # Use bytes mode
-                        )
-                        
-                        # Read output line by line with error handling for encoding
-                        while True:
-                            line_bytes = process.stdout.readline()
-                            if not line_bytes:
-                                break
-                                
-                            # Try to decode with different encodings
-                            try:
-                                # Try UTF-8 first
-                                line = line_bytes.decode('utf-8').strip()
-                            except UnicodeDecodeError:
-                                try:
-                                    # Try with errors='replace'
-                                    line = line_bytes.decode('utf-8', errors='replace').strip()
-                                except:
-                                    try:
-                                        # Try system default encoding
-                                        line = line_bytes.decode(sys.getdefaultencoding(), errors='replace').strip()
-                                    except:
-                                        # Last resort: ignore problematic characters
-                                        line = line_bytes.decode('ascii', errors='ignore').strip()
-                            
-                            if line:
-                                print(f"[{client_name}] {line}")
-                                with training_lock:
-                                    training_output.append(f"[{client_name}] {line}")
-                                    
-                                    # Update metrics based on output
-                                    if "epoch" in line.lower() and "%" in line:
-                                        try:
-                                            # Try to parse progress
-                                            parts = line.split()
-                                            for part in parts:
-                                                if "%" in part:
-                                                    progress_str = part.strip("%")
-                                                    # Handle potential non-numeric characters
-                                                    progress_str = ''.join(c for c in progress_str if c.isdigit() or c == '.')
-                                                    if progress_str:
-                                                        progress = float(progress_str) / 100.0
-                                                        current_fl_metrics["precision"] = 0.5 + progress * 0.4
-                                                        current_fl_metrics["recall"] = 0.45 + progress * 0.45
-                                                        current_fl_metrics["mAP50"] = 0.4 + progress * 0.5
-                                                        current_fl_metrics["mAP50_95"] = 0.35 + progress * 0.45
-                                                        break
-                                        except Exception as e:
-                                            print(f"Error parsing progress: {e}")
-                        
-                        process.wait()
-                        
-                        # Check if the process was successful
-                        if process.returncode != 0:
-                            print(f"Client {client_name} failed with return code {process.returncode}")
-                            with training_lock:
-                                training_output.append(f"Client {client_name} failed with return code {process.returncode}")
-                        else:
-                            print(f"Client {client_name} completed successfully")
-                            with training_lock:
-                                training_output.append(f"Client {client_name} completed successfully")
-                                
-                    except Exception as e:
-                        print(f"Error running client {client_name}: {e}")
-                        with training_lock:
-                            training_output.append(f"Error running client {client_name}: {e}")
-                
-                # After all clients have run, aggregate models (in a real system)
-                # For now, we'll just use the last client's model as the result
-                try:
-                    # Find the best model from the last client
-                    last_client_dir = client_output_dirs[-1]
-                    best_model_path = None
-                    
-                    # Look for best.pt in the expected location from our standalone script
-                    expected_best_path = os.path.join(last_client_dir, "runs", "train_result", "weights", "best.pt")
-                    if os.path.exists(expected_best_path):
-                        best_model_path = expected_best_path
-                    else:
-                        # Fallback: look for any .pt file
-                        for root, dirs, files in os.walk(last_client_dir):
-                            for file in files:
-                                if file.endswith(".pt"):
-                                    best_model_path = os.path.join(root, file)
-                                    break
-                            if best_model_path:
-                                break
-                    
-                    if best_model_path:
-                        # Copy the best model to the model path
-                        print(f"Found best model at {best_model_path}, copying to {model_path}")
-                        with training_lock:
-                            training_output.append(f"Found best model at {best_model_path}, copying to {model_path}")
-                        
-                        # Load and save the model
-                        try:
-                            temp_model = YOLO(best_model_path)
-                            temp_model.save(model_path)
-                            print(f"Saved aggregated model to {model_path}")
-                            with training_lock:
-                                training_output.append(f"Saved aggregated model to {model_path}")
-                        except Exception as e:
-                            print(f"Error saving aggregated model: {e}")
-                            with training_lock:
-                                training_output.append(f"Error saving aggregated model: {e}")
-                    else:
-                        print("Could not find best model from clients")
-                        with training_lock:
-                            training_output.append("Could not find best model from clients")
-                
-                except Exception as e:
-                    print(f"Error aggregating models: {e}")
-                    with training_lock:
-                        training_output.append(f"Error aggregating models: {e}")
-            
-            # Training completed
-            with training_lock:
-                current_fl_metrics["training_status"] = "Completed"
-                current_fl_metrics["last_update"] = datetime.now().strftime("%H:%M:%S")
-                training_output.append(f"Training completed. Model saved as {model_name}.pt")
-            
-            # Register the model in the model registry
-            try:
-                # Load the final model
-                try:
-                    final_model = YOLO(model_path)
-                    print(f"Successfully loaded final model from {model_path}")
-                except Exception as e:
-                    print(f"Error loading final model: {e}")
-                    # Try to load the default model as fallback
-                    default_model_path = os.path.join(ROOT_DIR, "fl", "models", "default_model.pt")
-                    if os.path.exists(default_model_path):
-                        print(f"Loading default model as fallback from {default_model_path}")
-                        final_model = YOLO(default_model_path)
-                    else:
-                        print("No default model found, using current model")
-                        final_model = model
-                
-                # Save to model registry
-                model_info = model_manager.save_model(final_model, model_name)
-                if model_info:
-                    print(f"Model registered: {model_info}")
-                    with training_lock:
-                        training_output.append(f"Model registered: {model_info}")
-                else:
-                    print("Failed to register model")
-                    with training_lock:
-                        training_output.append("Failed to register model")
-            except Exception as e:
-                print(f"Error registering model: {e}")
-                with training_lock:
-                    training_output.append(f"Error registering model: {e}")
-        
-        except Exception as e:
-            print(f"Error in training process: {e}")
-            with training_lock:
-                current_fl_metrics["training_status"] = "Failed"
-                current_fl_metrics["last_update"] = datetime.now().strftime("%H:%M:%S")
-                training_output.append(f"Training failed: {e}")
-    
-    # Start the training process in a thread
-    training_thread = threading.Thread(target=run_training_process)
-    training_thread.daemon = True
-    training_thread.start()
-    
-    return True
+    # Update clients connected (simulate active learning)
+    if current_fl_metrics["inference_count"] > 0:
+        current_fl_metrics["clients_connected"] = min(10, current_fl_metrics["inference_count"] // 5)
 
 def get_federated_metrics():
     """Get current federated learning training metrics - PRIORITIZE REAL DATA"""
-    global current_fl_metrics, training_output
+    global current_fl_metrics
     
     # If we have real data from inferences, use that instead of old log files
     if current_fl_metrics["inference_count"] > 0:
@@ -748,11 +462,6 @@ def get_model_info():
 def index():
     """Render the main page"""
     return render_template('index.html')
-    
-@app.route('/federated-training')
-def federated_training():
-    """Render the federated training page"""
-    return render_template('federated_training.html')
 
 @app.route('/model-info')
 def model_info():
@@ -765,15 +474,6 @@ def available_models():
     """Get list of available models from GitHub"""
     try:
         models = model_manager.list_available_models()
-        return jsonify({"models": models})
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
-        
-@app.route('/models')
-def list_models():
-    """Get list of all saved models"""
-    try:
-        models = model_manager.list_saved_models()
         return jsonify({"models": models})
     except Exception as e:
         return jsonify({"error": str(e)}), 500
@@ -844,7 +544,6 @@ def clear_cache():
 def run_inference_endpoint():
     """Run inference on uploaded files"""
     global inference_metrics
-    global model
     
     # Reset metrics for this batch
     initialize_metrics()
@@ -853,20 +552,6 @@ def run_inference_endpoint():
     files = request.files.getlist('files')
     if not files or all(file.filename == '' for file in files):
         return jsonify({"error": "No files uploaded"}), 400
-    
-    # Check if a specific model was requested
-    model_file = request.form.get('model')
-    if model_file:
-        # Load the requested model
-        try:
-            temp_model, model_type = model_manager.load_saved_model(model_file=model_file)
-            if temp_model:
-                model = temp_model
-                print(f"Switched to model: {model_file}")
-            else:
-                print(f"Failed to load model: {model_file}, using current model")
-        except Exception as e:
-            print(f"Error loading model {model_file}: {e}")
     
     results = []
     errors = []
@@ -964,9 +649,6 @@ def run_inference_endpoint():
             for obj_class, count in result["detected_objects"].items():
                 object_summary[obj_class] = object_summary.get(obj_class, 0) + count
     
-    # Get current model info
-    model_info = model_manager.get_model_info()
-    
     return jsonify({
         "results": results,
         "errors": errors,
@@ -976,80 +658,8 @@ def run_inference_endpoint():
             "precision": batch_metrics["precision"],
             "recall": batch_metrics["recall"],
             "f1_score": batch_metrics["f1_score"]
-        },
-        "model_info": {
-            "name": model_info.get("name", "Unknown"),
-            "file": model_info.get("file", "Unknown")
         }
     })
-
-@app.route('/start-federated-training', methods=['POST'])
-def start_federated_training():
-    """Start federated training with the provided configuration"""
-    try:
-        data = request.json
-        
-        # Validate required fields
-        if not data.get('modelName'):
-            return jsonify({"success": False, "message": "Model name is required"}), 400
-            
-        # Get training parameters
-        model_name = data.get('modelName')
-        epochs = int(data.get('epochs', 3))
-        rounds = int(data.get('rounds', 3))
-        clients = int(data.get('clients', 4))
-        
-        # Limit clients to the available datasets
-        clients = min(clients, 4)  # We only have 4 labeled datasets
-        
-        # Update global training metrics
-        global current_fl_metrics
-        current_fl_metrics.update({
-            "epochs": 0,
-            "total_rounds": rounds,
-            "clients_connected": 0,
-            "training_status": "Starting",
-            "last_update": datetime.now().strftime("%H:%M:%S"),
-            "model_name": model_name
-        })
-        
-        # Start the actual training process
-        success = run_training(model_name, epochs, rounds, clients)
-        
-        if success:
-            return jsonify({
-                "success": True,
-                "message": "Federated training started",
-                "config": {
-                    "modelName": model_name,
-                    "epochs": epochs,
-                    "rounds": rounds,
-                    "clients": clients
-                }
-            })
-        else:
-            return jsonify({
-                "success": False,
-                "message": "Failed to start training"
-            }), 500
-        
-    except Exception as e:
-        return jsonify({"success": False, "message": str(e)}), 500
-
-@app.route('/federated-training-status')
-def federated_training_status():
-    """Get current federated training status"""
-    global current_fl_metrics, training_output
-    
-    # Get a copy of the current training output
-    with training_lock:
-        output = training_output.copy()
-    
-    # Add training output to the response
-    response = {**current_fl_metrics}
-    response["training_output"] = output
-    
-    return jsonify(response)
 
 @app.route('/inference-results/<path:filename>')
 def serve_result(filename):

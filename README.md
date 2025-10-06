@@ -1,11 +1,9 @@
 # Train 🚉
 Train detection dashboard
 
-## To run [In terminal]
-move into the backend folder <br/>
-`cd backend` <br/>
+## To run [In terminal/powershell]
+move into the fl folder <br/>
+`cd fl` <br/>
 then run <br/>
-`3uvicorn main:app --reload`
+`python federated_app.py`
 
-## In another terminal run 
-`Npm run dev`
