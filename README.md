@@ -1,71 +1,47 @@
-# Train 🚉
-A federated and machine learning–based application for real-time train detection and analysis. This project integrates traditional centralized machine learning with a federated learning approach to enable distributed training across multiple clients, ensuring data privacy, scalability, and efficiency.
+# 🚆 Train Detection Dashboard  
 
-# 📘 Overview
+![Python](https://img.shields.io/badge/Python-3.8+-blue?logo=python)
+![Federated Learning](https://img.shields.io/badge/Federated%20Learning-Enabled-brightgreen)
+![Framework](https://img.shields.io/badge/Framework-Flower%20%7C%20TensorFlow%20%7C%20PyTorch-orange)
+![License](https://img.shields.io/badge/License-MIT-lightgrey)
+![Status](https://img.shields.io/badge/Status-Active-success)
 
-The Train Detection Dashboard uses computer vision and machine learning to identify and classify trains in image or video datasets. To enhance privacy and decentralization, this project implements Federated Learning (FL) — enabling multiple devices (clients) to collaboratively train a shared global model without exchanging raw data.
+> **A privacy-preserving machine learning and federated learning system for train detection and analytics.**
 
-The system demonstrates how AI applications can be deployed securely and efficiently in transportation monitoring contexts, such as:
+---
 
-Train detection from surveillance footage
+## 📘 Overview  
 
-Safety monitoring on rail networks
+The **Train Detection Dashboard** integrates **Machine Learning (ML)** and **Federated Learning (FL)** to enable intelligent, decentralized detection of trains from video or image data — while keeping sensitive data local.  
+It demonstrates how distributed AI can support **transportation monitoring**, **railway safety**, and **real-time analytics** through privacy-aware model collaboration.
 
-Real-time analytics for transportation systems 
+---
 
-# 🧠 Machine Learning Component
+## 🎯 Objectives  
 
-The machine learning pipeline involves:
+- Detect and classify trains using a deep learning model.  
+- Train models collaboratively across multiple clients without sharing raw data.  
+- Evaluate performance differences between centralized and federated learning.  
+- Demonstrate the potential of federated AI for intelligent transportation systems.
 
-Data Preprocessing – Cleaning, normalization, and feature extraction from image/video inputs.
+---
 
-Model Architecture – A CNN-based detection model (e.g., YOLO or custom TensorFlow/PyTorch model) trained on train imagery datasets.
+## 🧠 Machine Learning Workflow  
 
-Training and Evaluation – Local training on client datasets, with accuracy, precision, and recall metrics.
+| Step | Description |
+|------|--------------|
+| **1. Data Preprocessing** | Load and clean datasets, normalize pixel values, and prepare inputs for CNN models. |
+| **2. Model Architecture** | Use a CNN (e.g., YOLO, ResNet, or custom TensorFlow model) to identify trains in images. |
+| **3. Training** | Train the model using backpropagation and monitor accuracy/loss metrics. |
+| **4. Evaluation** | Compare model accuracy, precision, recall, and F1 score across datasets. |
+| **5. Inference** | Perform real-time train detection using the trained model on new data. |
 
-Inference – Running the trained model on unseen data for detection and classification.
+### Example (Centralized Training)
+```python
+from model import create_model
+from utils import load_data
 
-The ML model can operate independently in centralized environments or as part of the federated learning process. 
-
-# 🌐 Federated Learning Component
-
-The federated system enables distributed model training across multiple client nodes:
-
-Client Nodes: Each client (e.g., local device, station server) holds its own dataset and trains a local model.
-
-Central Server: The federated_app.py script coordinates model aggregation using the Federated Averaging (FedAvg) algorithm.
-
-Privacy Preservation: Only model parameters (weights and gradients) are exchanged — not raw data — protecting sensitive visual data.
-
-Communication Rounds: The system runs iterative communication rounds to synchronize global model updates until convergence. 
-
-#⚙️ Installation & Setup
-### 1️⃣ Prerequisites
-
-Ensure the following are installed:
-
-Python 3.8+
-
-pip package manager
-
-Virtual environment (recommended) 
-
-### 2️⃣ Dependencies
-
-Install required libraries:
-
-`pip install -r requirements.txt` <br/>
-
-
-
-(Ensure the requirements.txt includes flwr, torch or tensorflow, opencv-python, and numpy.)
-
-
-(Ensure the requirements.txt includes flwr, torch or tensorflow, opencv-python, and numpy.)
-
-## To run [In terminal/powershell]
-move into the fl folder <br/>
-`cd fl` <br/>
-then run <br/>
-`python federated_app.py`
-
+X_train, y_train, X_test, y_test = load_data()
+model = create_model()
+model.fit(X_train, y_train, epochs=10, validation_data=(X_test, y_test))
+model.save("train_detector_model.h5")
