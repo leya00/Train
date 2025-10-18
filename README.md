@@ -45,3 +45,18 @@ X_train, y_train, X_test, y_test = load_data()
 model = create_model()
 model.fit(X_train, y_train, epochs=10, validation_data=(X_test, y_test))
 model.save("train_detector_model.h5")
+```
+
+## 🌐 Federated Learning (FL) Overview  
+
+The federated stepup allows multiple clients **clients** to collaboratively train a shared **global model** under a central **aggregation server**. 
+
+--- 
+
+## 🏗️ Architecture 
+
+- **Server ('server.py')** - Coordinate communication rounds and aggregates local model updates.
+- **Clients ('client.py)'** - Train models on their local datasets and send only weights/gradients back to the server.
+- **Aggregator** – Uses the **Federated Averaging (FedAvg)** algorithm to merge model updates into a unified global model.
+
+--- 
