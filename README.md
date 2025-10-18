@@ -37,7 +37,31 @@ Central Server: The federated_app.py script coordinates model aggregation using 
 
 Privacy Preservation: Only model parameters (weights and gradients) are exchanged — not raw data — protecting sensitive visual data.
 
-Communication Rounds: The system runs iterative communication rounds to synchronize global model updates until convergence.
+Communication Rounds: The system runs iterative communication rounds to synchronize global model updates until convergence. 
+
+#⚙️ Installation & Setup
+### 1️⃣ Prerequisites
+
+Ensure the following are installed:
+
+Python 3.8+
+
+pip package manager
+
+Virtual environment (recommended) 
+
+### 2️⃣ Dependencies
+
+Install required libraries:
+
+pip install -r requirements.txt 
+
+
+
+(Ensure the requirements.txt includes flwr, torch or tensorflow, opencv-python, and numpy.)
+
+
+(Ensure the requirements.txt includes flwr, torch or tensorflow, opencv-python, and numpy.)
 
 ## To run [In terminal/powershell]
 move into the fl folder <br/>
