@@ -1,62 +1,197 @@
-# 🚆 Train Detection Dashboard  
+# 🚆 Train Detection Dashboard
 
-![Python](https://img.shields.io/badge/Python-3.8+-blue?logo=python)
-![Federated Learning](https://img.shields.io/badge/Federated%20Learning-Enabled-brightgreen)
-![Framework](https://img.shields.io/badge/Framework-Flower%20%7C%20TensorFlow%20%7C%20PyTorch-orange)
-![License](https://img.shields.io/badge/License-MIT-lightgrey)
-![Status](https://img.shields.io/badge/Status-Active-success)
-
-> **A privacy-preserving machine learning and federated learning system for train detection and analytics.**
+A privacy-preserving **Machine Learning (ML)** and **Federated Learning (FL)** system for **train detection and analytics**.  
+This project demonstrates how distributed AI can support transportation monitoring, railway safety, and real-time analytics — all while keeping sensitive video data secure on the edge.
 
 ---
 
-## 📘 Overview  
-
-The **Train Detection Dashboard** integrates **Machine Learning (ML)** and **Federated Learning (FL)** to enable intelligent, decentralized detection of trains from video or image data — while keeping sensitive data local.  
-It demonstrates how distributed AI can support **transportation monitoring**, **railway safety**, and **real-time analytics** through privacy-aware model collaboration.
+## 🧭 Table of Contents
+- [Key Features](#key-features)
+- [Architecture](#architecture)
+- [Repository Structure](#repository-structure)
+- [Prerequisites](#prerequisites)
+- [Quick Start](#quick-start)
+  - [1) Centralised ML Demo](#1-centralised-ml-demo)
+  - [2) Federated Learning (Server + Clients)](#2-federated-learning-server--clients)
+  - [3) Dashboard / App](#3-dashboard--app)
+- [Data & Model Notes](#data--model-notes)
+- [Configuration](#configuration)
+- [Troubleshooting](#troubleshooting)
+- [Roadmap](#roadmap)
+- [Contributing](#contributing)
+- [Acknowledgements](#acknowledgements)
+- [License](#license)
 
 ---
 
-## 🎯 Objectives  
+## 🚀 Key Features
 
-- Detect and classify trains using a deep learning model.  
-- Train models collaboratively across multiple clients without sharing raw data.  
-- Evaluate performance differences between centralized and federated learning.  
-- Demonstrate the potential of federated AI for intelligent transportation systems.
+- **Train Detection** using a YOLOv5-based deep learning model.
+- **Federated Learning (FL)** implementation allowing mulitple clients to train locally while sharing only model weights.
+- ** Privacy-perserving training** ], ensuring raw data remains on local clients.
+- **Dashboard integration** for uploading videos or images and visualising predictions.
+- **Lightweight, modular design** for rapid documentation and scaling.
 
 ---
 
-## 🧠 Machine Learning Workflow  
+## 🏗️ Architecture  
 
-| Step | Description |
-|------|--------------|
-| **1. Data Preprocessing** | Load and clean datasets, normalize pixel values, and prepare inputs for CNN models. |
-| **2. Model Architecture** | Use a CNN (e.g., YOLO, ResNet, or custom TensorFlow model) to identify trains in images. |
-| **3. Training** | Train the model using backpropagation and monitor accuracy/loss metrics. |
-| **4. Evaluation** | Compare model accuracy, precision, recall, and F1 score across datasets. |
-| **5. Inference** | Perform real-time train detection using the trained model on new data. |
-
-### Example (Centralized Training)
-```python
-from model import create_model
-from utils import load_data
-
-X_train, y_train, X_test, y_test = load_data()
-model = create_model()
-model.fit(X_train, y_train, epochs=10, validation_data=(X_test, y_test))
-model.save("train_detector_model.h5")
+```text
+                +-------------------+
+                |   Aggregation     |
+                |     Server        |
+                | (FedAvg, logging) |
+                +---------+---------+
+                          ^
+                          | model updates
+             -------------+-------------
+             |                           |
++-------------------+         +-------------------+
+|   Client A        |         |   Client B        |
+| Local data        |         | Local data        |
+| Train locally     |         | Train locally     |
+| send weights -->  |         | send weights -->  |
++-------------------+         +-------------------+
 ```
-
-## 🌐 Federated Learning (FL) Overview  
-
-The federated stepup allows multiple clients **clients** to collaboratively train a shared **global model** under a central **aggregation server**. 
-
---- 
-
-## 🏗️ Architecture 
 
 - **Server ('server.py')** - Coordinate communication rounds and aggregates local model updates.
 - **Clients ('client.py)'** - Train models on their local datasets and send only weights/gradients back to the server.
 - **Aggregator** – Uses the **Federated Averaging (FedAvg)** algorithm to merge model updates into a unified global model.
 
 --- 
+
+## 🗂 Repository Structure 
+.
+├─ backend/                 # Backend service code (API endpoints, dashboard logic)
+├─ fl/                      # Federated learning utilities and scripts
+├─ data/                    # Dataset directory (local client data)
+├─ frames/video_1/          # Example extracted video frames
+├─ model/train/             # Model checkpoints and logs
+├─ static/uploads/          # Directory for uploaded files
+├─ client_yolo.py           # FL client (YOLOv5)
+├─ server_yolo.py           # FL server (FedAvg)
+├─ federated_yolov5_app.py  # Federated learning app entry point
+├─ requirements.txt         # Python dependencies
+└─ .gitmodules              # Submodules (e.g., YOLOv5 detector) 
+
+--- 
+
+## ⚙️ Prerequisites 
+- Python +3.9 (Python 3.10 recommended)
+- **pip** and **venv**
+- (Optional) NVIDIA GPU with CUDA support for faster training
+- **ffmpeg** (for video-to-frame extraction)**
+Install dependencies:
+```
+pip install -r requirements.txt
+```
+
+--- 
+
+## 🧠 Quick Start 
+#### 1️⃣ Centralised ML Demo 
+If you want to run a quick local inference: 
+```
+# 1. Clone Repository
+git clone https://github.com/leya00/Train.git
+cd Train
+
+# 2. Set up environment
+python -m -venv .venv
+source .venv/bin/activate # or .venv\Scripts\activate on Windows
+
+# 3. Install dependencies
+pip install -r requirements.txt
+
+# 4. Run centralised detection demo
+python federated_yolov5_app.py
+```
+Ensure your input frames or videos are stored in:
+
+- frames/video_1/
+- data/
+- static/uploads/
+
+#### 2️⃣ Federated Learning (Server + Clients)
+##### 🖥️ Start the Server
+```python server_yolo.py --rounds 5 --port 8080```
+
+💻 Start Client(s)
+##### Example for Client A
+```python client_yolo.py --server http://127.0.0.1:8080 --data ./data/client_a --epochs 1 --batch-size 8```
+
+##### Example for Client B
+```python client_yolo.py --server http://127.0.0.1:8080 --data ./data/client_b --epochs 1 --batch-size 8```
+
+##### 🧩 Single-Process FL Demo
+```python federated_yolov5_app.py``` 
+
+#### 3️⃣ Dashboard / App
+
+A backend dashboard is available for uploading videos and visualising detections.
+
+To run:
+```
+cd backend
+export FLASK_APP=app.py
+flask run 
+```
+Access it via your browser at http://127.0.0.1:5000 
+
+## 📦 Data & Model Notes
+
+- Sample Frames: Provided under frames/video_1/.
+- Datasets: Add local training data to data/client_a/, data/client_b/, etc.
+- Checkpoints: Saved in model/train/ after training.
+
+Ensure each client dataset follows YOLOv5 directory format (images and labels). 
+
+## ⚙️ Configuration
+
+Common arguments and flags: 
+| Parameter      | Description                          |
+| -------------- | ------------------------------------ |
+| `--epochs`     | Number of training epochs per client |
+| `--batch-size` | Training batch size                  |
+| `--img-size`   | Input image resolution               |
+| `--server`     | Server address for FL communication  |
+| `--rounds`     | Number of federated rounds           |
+| `--data`       | Dataset directory path               |
+| `--weights`    | Path to pretrained weights           |
+
+## 🛠️ Troubleshooting 
+| Issue                  | Solution                                                         |
+| ---------------------- | ---------------------------------------------------------------- |
+| **Submodule missing**  | Run `git submodule update --init --recursive`                    |
+| **CUDA not available** | Ensure GPU drivers and CUDA toolkit are installed                |
+| **Image path errors**  | Verify paths in `frames/video_1/`, `data/`, or `static/uploads/` |
+| **Port in use**        | Change port using `--port` flag                                  |
+| **No detections**      | Check model weights and dataset labels                           |
+
+## 🧭 Roadmap 
+- Integrate real-time video streaming
+- Add evaluation metrics dashboard (Precision, Recall, F1)
+- Support YOLOv8-based training
+- Add Docker container deployment
+- Improve frontend visualisation with Plotly/Chart.js
+
+## 🤝 Contributing
+Contributions are welcome!
+Please: 
+- Fork this repository
+- Create a feature branch
+- Commit changes with descriptive messages
+- Open a Pull Request (PR)
+
+## 🙏 Acknowledgements
+
+- [**YOLOv5**](https://github.com/ultralytics/yolov5) — for the base detection framework  
+- [**Flower**](https://flower.dev) — for federated learning inspiration  
+- [**OpenCV**](https://opencv.org) — for image processing  
+- [**Flask**](https://flask.palletsprojects.com) — for backend services
+- Optional [**GroundingDino**](https://github.com/IDEA-Research/GroundingDINO) - this was another model for machine learning but due to heavy training requirements, it was close to optimised.
+
+## 🧩 Author
+
+Developed by:
+Joseph Linao, Belal Nur, Andrew Yang, Shania Chu Pui Chan, Kaitlyn Chan, Leya Asmeron — integrating Machine Learning, Federated Learning, and Web Deployment for AI-driven transport analytics.
