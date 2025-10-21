@@ -8,6 +8,15 @@ This project demonstrates how distributed AI can support transportation monitori
 ## 🧭 Table of Contents
 - [Key Features](#key-features)
 - [Architecture](#architecture)
+- [System-Demonstration](#system-demonstration)
+    - [1. Purpose](#1️.Purpose)
+    - [2. System Structure](#2.System-Structure)
+    - [3. Components](#3.Components)
+    - [4. Workflow](#4.Workflow)
+    - [5. API Overview](#5.API-Overview)
+    - [6. Typical Use Scenarios](#6.Typical-Use-Scenarios)
+    - [7. Security & Privacy](#7.Security-&-Privacy)
+    - [8. Future Improvements](#8.Future-Improvements)
 - [Repository Structure](#repository-structure)
 - [Prerequisites](#prerequisites)
 - [Quick Start](#quick-start)
@@ -58,7 +67,78 @@ This project demonstrates how distributed AI can support transportation monitori
 - **Clients ('client.py)'** - Train models on their local datasets and send only weights/gradients back to the server.
 - **Aggregator** – Uses the **Federated Averaging (FedAvg)** algorithm to merge model updates into a unified global model.
 
---- 
+---  
+
+## System Demonstration (End-to-End) 
+#### 1️. Purpose
+   
+Showcasing how machine learning and federated learning can be applied for privacy aware object detection across distributed sites. It can solve problems related to data centralization, privacy, and collaboration between mulitple nodes.
+
+Who uses it? 
+- Researches & Students learning Federated Learning (FL)
+- Developers integrating YOLO-based models on model based detection
+- Project evaluators and stakeholders viewing a working demo
+
+#### 2️. System Structure
+User Interface (Flask)
+    │
+    ├── API Requests (HTTP)
+    │
+    ├── YOLOv5 Inference Engine
+    │
+    └── Federated Learning (Flower)
+          ├── FL Server (Coordinator)
+          └── FL Clients (Local Nodes)
+Data never leaves the client, only model weights are shared.
+#### 3️. Components
+| Component            | Description                                                 |
+| -------------------- | ----------------------------------------------------------- |
+| **Frontend/UI**      | Flask-based web dashboard to trigger inference and training |
+| **Backend**          | Flask API routes handling training and inference logic      |
+| **YOLOv5 Model**     | Performs object detection on train images/videos            |
+| **Flower FL Server** | Coordinates training rounds and aggregates models           |
+| **FL Clients**       | Each client trains locally on private datasets              |
+| **Data Storage**     | Stores training results, model weights, and logs            |
+
+  #### 4. Workflow
+  a. User uploads data or triggers an inference from the UI
+  b. Flask sends request -> YOLOv5 runs detection -> results displayed
+  c. For FL mode:
+      i. FL server starts (*federated_app.py*)
+     ii. Clients train locally.
+     iii. Updates sent to server 
+  d. Global model improves collaboratively without data sharing.
+  
+#### 5. API Overview
+| Endpoint                 | Method | Description                   |
+| ------------------------ | ------ | ----------------------------- |
+| `/inference`             | POST   | Run YOLOv5 inference          |
+| `/train/central`         | POST   | Start centralized training    |
+| `/train/federated/start` | POST   | Start federated training      |
+| `/status`                | GET    | Check job and training status |
+| `/artifacts`             | GET    | Access model outputs and logs |
+
+
+   
+#### 6️. Typical Uses Systems
+✅ Inference Mode
+
+Upload an image or video → Run YOLOv5 → See detection results.
+
+🔁 Federated Mode
+
+Start Flower server → Connect local clients → Train collaboratively → Aggregate global model.
+    
+#### 7. Security & Privacy
+- Federated setup ensures data stays local
+- Central server receives only model paramters, not imgaes
+- Environement variables handles secrets
+- Logs avoid storing sensitive details
+
+#### 8. Future improvements
+- Integrate latest version of YOLO/RT-DETR models (GroundingDino if it needs a larger scale of model-based detection)
+- Add a lively dashboard for FL progress
+ 
 
 ## 🗂 Repository Structure 
 .
