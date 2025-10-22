@@ -4,301 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Train Detection System</title>
-    <style>
-      body {
-        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-        max-width: 1200px;
-        margin: 0 auto;
-        padding: 20px;
-        background: rgb(111, 130, 153);
-        min-height: 100vh;
-        line-height: 1.6;
-      }
-      h1 {
-        color: #000000;
-        text-align: center;
-        margin-bottom: 30px;
-        font-weight: 300;
-        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
-      }
-      h2,
-      h3 {
-        color: #2c3e50;
-        margin-bottom: 15px;
-      }
-      .container {
-        background-color: white;
-        padding: 25px;
-        border-radius: 12px;
-        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-        margin-bottom: 20px;
-        border: 1px solid rgba(255, 255, 255, 0.2);
-      }
-      .metrics-container {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 20px;
-      }
-      .metric-card {
-        background: rgb(227, 229, 239);
-        border: none;
-        border-radius: 10px;
-        padding: 20px;
-        flex: 1;
-        min-width: 200px;
-        color: rgb(0, 0, 0);
-        box-shadow: 0 4px 15px rgba(79, 172, 254, 0.3);
-        transition: transform 0.3s ease;
-      }
-      .metric-card:hover {
-        transform: translateY(-2px);
-      }
-      .metric-value {
-        font-size: 28px;
-        font-weight: bold;
-        color: #113e71;
-        text-shadow: 0 1px 3px rgba(255, 255, 255, 0.3);
-      }
-      .metric-card h3 {
-        color: #000000;
-        margin-bottom: 10px;
-        font-size: 14px;
-        text-transform: uppercase;
-        letter-spacing: 1px;
-      }
-      .upload-container {
-        border: 2px dashed #5287b5;
-        padding: 30px;
-        text-align: center;
-        cursor: pointer;
-        margin-bottom: 20px;
-        border-radius: 10px;
-        background: linear-gradient(
-          135deg,
-          rgba(79, 172, 254, 0.1) 0%,
-          rgba(0, 242, 254, 0.1) 100%
-        );
-        transition: all 0.3s ease;
-      }
-      .upload-container:hover {
-        border-color: #000000;
-        background: linear-gradient(
-          135deg,
-          rgba(79, 172, 254, 0.2) 0%,
-          rgba(0, 242, 254, 0.2) 100%
-        );
-        transform: translateY(-2px);
-      }
-      .results-container {
-        margin-top: 20px;
-      }
-      .result-item {
-        border-bottom: 1px solid #e3f2fd;
-        padding: 15px 0;
-        border-radius: 8px;
-        margin-bottom: 10px;
-        background: linear-gradient(
-          135deg,
-          rgba(79, 172, 254, 0.05) 0%,
-          rgba(0, 242, 254, 0.05) 100%
-        );
-        padding: 15px;
-      }
-      .result-item:last-child {
-        border-bottom: none;
-      }
-      button {
-        background: linear-gradient(135deg, #216097 0%, #1e5658 100%);
-        color: white;
-        border: none;
-        padding: 12px 30px;
-        border-radius: 25px;
-        cursor: pointer;
-        font-size: 16px;
-        font-weight: 500;
-        transition: all 0.3s ease;
-        box-shadow: 0 4px 15px rgba(79, 172, 254, 0.3);
-      }
-      button:hover:not(:disabled) {
-        transform: translateY(-2px);
-        box-shadow: 0 6px 20px rgba(79, 172, 254, 0.4);
-      }
-      button:disabled {
-        background: #bdc3c7;
-        cursor: not-allowed;
-        box-shadow: none;
-      }
-      .progress-bar {
-        height: 10px;
-        background-color: #e3f2fd;
-        border-radius: 5px;
-        margin-top: 5px;
-      }
-      .progress-bar-fill {
-        height: 100%;
-        background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
-        border-radius: 5px;
-        transition: width 0.3s ease;
-      }
-      .hidden {
-        display: none;
-      }
-      .loading {
-        text-align: center;
-        padding: 30px;
-        background: linear-gradient(
-          135deg,
-          rgba(79, 172, 254, 0.1) 0%,
-          rgba(0, 242, 254, 0.1) 100%
-        );
-        border-radius: 10px;
-        color: #2c3e50;
-      }
-      .video-container {
-        margin-top: 10px;
-      }
-      video {
-        max-width: 100%;
-        max-height: 400px;
-      }
-      .batch-metrics {
-        margin-top: 20px;
-        padding: 20px;
-        background: linear-gradient(
-          135deg,
-          rgba(79, 172, 254, 0.1) 0%,
-          rgba(0, 242, 254, 0.1) 100%
-        );
-        border-radius: 10px;
-      }
-      .detection-summary {
-        margin-top: 15px;
-        padding: 10px 15px;
-        background: rgba(227, 229, 239, 0.5);
-        border-radius: 8px;
-        border-left: 4px solid #216097;
-      }
-      .detection-list {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 10px;
-        margin-top: 8px;
-      }
-      .detected-object {
-        background: #216097;
-        color: white;
-        padding: 5px 10px;
-        border-radius: 15px;
-        font-size: 14px;
-        display: inline-block;
-      }
-      .object-name {
-        font-weight: bold;
-      }
-      .object-count {
-        background: rgba(255, 255, 255, 0.3);
-        padding: 2px 6px;
-        border-radius: 10px;
-        margin-left: 3px;
-      }
-      .no-detections {
-        color: #777;
-        font-style: italic;
-      }
-      /* Tweet toast base */
-      .tweet {
-        position: fixed;
-        right: 18px;
-        bottom: 18px;
-        max-width: 320px;
-        display: flex;
-        gap: 10px;
-        background: #fff;
-        color: #0f1419;
-        border: 1px solid rgba(0, 0, 0, 0.08);
-        border-radius: 14px;
-        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
-        padding: 12px 14px;
-        z-index: 9999;
-        opacity: 0;
-        transform: translateY(8px) scale(0.98);
-        transition: opacity 0.22s ease, transform 0.22s ease;
-        font-family: system-ui, -apple-system, Segoe UI, Roboto,
-          "Helvetica Neue", Arial, sans-serif;
-      }
-
-      .tweet.show {
-        opacity: 1;
-        transform: translateY(0) scale(1);
-      }
-      .tweet.hidden {
-        pointer-events: none;
-      }
-
-      .tweet__avatar {
-        width: 36px;
-        height: 36px;
-        border-radius: 50%;
-        display: grid;
-        place-items: center;
-        background: #e8f5fd;
-        font-size: 18px;
-      }
-
-      .tweet__header {
-        font-size: 13px;
-        color: #536471;
-      }
-      .tweet__header strong {
-        color: #0f1419;
-        font-weight: 700;
-      }
-      .tweet__text {
-        margin-top: 4px;
-        font-size: 14px;
-        line-height: 1.35;
-      }
-
-      .dots span {
-        display: inline-block;
-        opacity: 0;
-      }
-      .dots span:nth-child(1) {
-        animation: blink 1.2s infinite 0s;
-      }
-      .dots span:nth-child(2) {
-        animation: blink 1.2s infinite 0.2s;
-      }
-      .dots span:nth-child(3) {
-        animation: blink 1.2s infinite 0.4s;
-      }
-
-      @keyframes blink {
-        0%,
-        20% {
-          opacity: 0;
-          transform: translateY(0);
-        }
-        50% {
-          opacity: 1;
-          transform: translateY(-1px);
-        }
-        100% {
-          opacity: 0;
-          transform: translateY(0);
-        }
-      }
-
-      @media (prefers-reduced-motion: reduce) {
-        .tweet {
-          transition: none;
-        }
-        .dots span {
-          animation: none;
-          opacity: 1;
-        }
-      }
-    </style>
+    <link rel="stylesheet" href="/static/styles.css">
   </head>
   <body>
     <h1>Federated Learning Inference Interface</h1>
@@ -310,6 +16,14 @@
 
     <div class="container">
       <h2>Upload & Process</h2>
+      
+      <div class="model-selector">
+        <h3>Select Model</h3>
+        <select id="model-select">
+          <option value="">Loading models...</option>
+        </select>
+      </div>
+      
       <div class="upload-container" id="upload-area">
         <p>Drop files here or click to upload</p>
         <p>
@@ -327,7 +41,7 @@
         />
       </div>
       <button id="run-inference-btn" disabled>Process Files</button>
-      <div id="upload-status"></div>
+      <div id="upload-status" style="text-align: center; margin-top: 10px;"></div>
     </div>
 
     <div class="container hidden" id="results-section">
@@ -362,6 +76,7 @@
     <script>
       // DOM elements
       const modelInfoEl = document.getElementById("model-info");
+      const modelSelect = document.getElementById("model-select");
       const uploadArea = document.getElementById("upload-area");
       const fileInput = document.getElementById("file-input");
       const runInferenceBtn = document.getElementById("run-inference-btn");
@@ -373,9 +88,13 @@
 
       // Selected files
       let selectedFiles = [];
+      let selectedModel = "";
 
       // Load model info when page loads
-      window.addEventListener("DOMContentLoaded", loadModelInfo);
+      window.addEventListener("DOMContentLoaded", () => {
+        loadModelInfo();
+        loadModels();
+      });
 
       // Set up file upload handlers
       uploadArea.addEventListener("click", () => fileInput.click());
@@ -395,6 +114,13 @@
 
       // Run inference button
       runInferenceBtn.addEventListener("click", runInference);
+      
+      // Model select handler
+      modelSelect.addEventListener("change", function() {
+        selectedModel = this.value;
+        localStorage.setItem("selectedModel", selectedModel);
+        runInferenceBtn.disabled = !selectedFiles.length || !selectedModel;
+      });
 
       // Function to load model info
       async function loadModelInfo() {
@@ -407,7 +133,11 @@
                     <div class="metrics-container">
                         <div class="metric-card">
                             <h3>Model Name</h3>
-                            <div>${data.model_name}</div>
+                            <div>${
+                              data.model_manager_info && data.model_manager_info.name
+                                ? data.model_manager_info.name
+                                : data.model_name
+                            }</div>
                         </div>
                         <div class="metric-card">
                             <h3>Model Type</h3>
@@ -461,7 +191,9 @@
                         <div class="metric-card">
                             <h3>Last Update</h3>
                             <div>${
-                              data.federated_metrics.last_update || "Never"
+                              data.model_manager_info && data.model_manager_info.loaded_at
+                                ? new Date(data.model_manager_info.loaded_at).toLocaleTimeString()
+                                : data.federated_metrics.last_update || "Never"
                             }</div>
                         </div>
                     </div>
@@ -473,6 +205,42 @@
         }
       }
 
+      // Function to load available models
+      async function loadModels() {
+        try {
+          const response = await fetch("/models");
+          const data = await response.json();
+          
+          // Clear existing options
+          modelSelect.innerHTML = "";
+          
+          // Add default option
+          const defaultOption = document.createElement("option");
+          defaultOption.value = "";
+          defaultOption.textContent = "Select a model...";
+          modelSelect.appendChild(defaultOption);
+          
+          // Add models from server
+          if (data.models && data.models.length > 0) {
+            data.models.forEach(model => {
+              const option = document.createElement("option");
+              option.value = model.file;
+              option.textContent = model.name;
+              modelSelect.appendChild(option);
+            });
+          }
+          
+          // Set previously selected model if available
+          const savedModel = localStorage.getItem("selectedModel");
+          if (savedModel) {
+            modelSelect.value = savedModel;
+            selectedModel = savedModel;
+          }
+        } catch (error) {
+          console.error("Error loading models:", error);
+        }
+      }
+      
       // Function to handle file selection
       function handleFileSelect(event) {
         const files = event.target.files;
@@ -480,7 +248,7 @@
 
         selectedFiles = Array.from(files);
         uploadStatus.innerHTML = `Selected ${selectedFiles.length} file(s)`;
-        runInferenceBtn.disabled = false;
+        runInferenceBtn.disabled = !selectedModel;
       }
 
       // Function to run inference
@@ -499,6 +267,11 @@
         selectedFiles.forEach((file) => {
           formData.append("files", file);
         });
+        
+        // Add selected model if available
+        if (selectedModel) {
+          formData.append("model_file", selectedModel);
+        }
 
         try {
           // Send request
@@ -557,6 +330,10 @@
                     <div class="metric-card">
                         <h3>Total Detections</h3>
                         <div class="metric-value">${data.total_detections}</div>
+                    </div>
+                    <div class="metric-card">
+                        <h3>Model Used</h3>
+                        <div class="metric-value">${data.model_info ? data.model_info.name : "Default"}</div>
                     </div>
                 </div>
                 

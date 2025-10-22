@@ -10,6 +10,8 @@ import requests
 from ultralytics import YOLO
 from model_manager import ModelManager
 import logging
+from datetime import datetime
+
 
 # Set up logging
 logging.basicConfig(level=logging.INFO)
@@ -124,7 +126,6 @@ def update_federated_metrics_after_inference(result):
         current_fl_metrics["training_status"] = "No Detections - Learning Needed"
     
     # Update last update time
-    from datetime import datetime
     current_fl_metrics["last_update"] = datetime.now().strftime("%H:%M:%S")
     
     # Update round based on actual performance
@@ -199,7 +200,7 @@ def get_federated_metrics():
                                 "total_rounds": len(lines),
                                 "clients_connected": 10,  # Default from log filename
                                 "training_status": "Completed" if int(round_num) >= 99 else "In Progress",
-                                "last_update": "From Log File"
+                                "last_update": datetime.now().strftime("%H:%M:%S")
                             })
                             return current_fl_metrics
         
@@ -227,7 +228,7 @@ def get_federated_metrics():
                     "total_rounds": int(last_row.get("epoch", current_fl_metrics["total_rounds"])),
                     "clients_connected": 0,
                     "training_status": "Completed",
-                    "last_update": "From CSV"
+                    "last_update": datetime.now().strftime("%H:%M:%S")
                 })
                 return current_fl_metrics
     except Exception as e:
@@ -463,6 +464,15 @@ def index():
     """Render the main page"""
     return render_template('index.html')
 
+@app.route('/models')
+def list_models():
+    """Get list of all saved models"""
+    try:
+        models = model_manager.list_saved_models()
+        return jsonify({"models": models})
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
 @app.route('/model-info')
 def model_info():
     """Return model information and metrics"""
@@ -539,6 +549,14 @@ def clear_cache():
         return jsonify({"success": True, "message": "Cache cleared"})
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+    
+@app.route('/get_federated_metrics')
+def get_federated_metrics_route():
+    """API route that returns federated metrics (with timestamp)."""
+    metrics = get_federated_metrics()  # call the main logic function
+    metrics["last_update"] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    return jsonify({"federated_metrics": metrics})
+
 
 @app.route('/run-inference', methods=['POST'])
 def run_inference_endpoint():

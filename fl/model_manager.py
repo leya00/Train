@@ -403,16 +403,27 @@ class ModelManager:
     def _load_model_registry(self):
         """Load the model registry from file"""
         if not self.registry_file.exists():
-            return {
+            # Create default registry
+            default_registry = {
                 "models": [
                     {
                         "name": "default_model",
                         "file": "default_model.pt",
-                        "created_at": datetime.now().isoformat()
+                        "created_at": datetime.now().isoformat(),
+                        "updated_at": datetime.now().isoformat()
                     }
                 ],
                 "last_updated": datetime.now().isoformat()
             }
+            
+            # Create the registry file
+            try:
+                self._save_model_registry(default_registry)
+                logger.info(f"Created new model registry at {self.registry_file}")
+            except Exception as e:
+                logger.error(f"Failed to create model registry: {e}")
+                
+            return default_registry
         
         try:
             with open(self.registry_file, 'r') as f:
@@ -502,6 +513,28 @@ class ModelManager:
             list: List of saved models
         """
         registry = self._load_model_registry()
+        
+        # Check for model files that might not be in the registry
+        model_files = list(self.models_dir.glob("*.pt"))
+        registered_files = [m["file"] for m in registry["models"]]
+        
+        # Add any unregistered model files to the registry
+        for model_file in model_files:
+            if model_file.name not in registered_files:
+                # Add to registry with the filename as the model name
+                model_name = model_file.stem  # filename without extension
+                registry["models"].append({
+                    "name": model_name,
+                    "file": model_file.name,
+                    "created_at": datetime.now().isoformat()
+                })
+                logger.info(f"Added unregistered model {model_file.name} to registry")
+        
+        # Save updated registry if we added any models
+        if len(registry["models"]) > len(registered_files):
+            registry["last_updated"] = datetime.now().isoformat()
+            self._save_model_registry(registry)
+            
         return registry["models"]
     
     def load_saved_model(self, model_name=None, model_file=None):
