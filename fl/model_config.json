@@ -6,11 +6,11 @@
   "cache_duration_hours": 24,
   "auto_update": true,
   "fallback_to_default": true,
-   "last_update_check": "2025-10-21T22:44:58.384985",
+  "last_update_check": "2025-10-29T17:42:57.500532",
   "model_versions": {
     "final_model.pt": {
-      "hash": "d7b3ec71969a455038ac53f7962562f0",
-      "downloaded_at": "2025-10-21T22:44:58.384985",
+      "hash": "a827f395295081964a6a5f84730f1760",
+      "downloaded_at": "2025-10-29T17:42:57.500532",
       "size": 5476101
     }
   },
