@@ -174,14 +174,19 @@ If you want to run a quick local inference:
 ```
 # 1. Clone Repository
 git clone https://github.com/leya00/Train.git
-cd fl
+cd Train
 
-# 2. Install dependencies
+
+# 2. Set up environment
+python -m -venv .venv
+source .venv/bin/activate # or .venv\Scripts\activate on Windows
+
+# 3. Install dependencies
 pip install -r requirements.txt
 pip install flask-cors 
 
-# 3. Run centralised detection demo
-python federated_app.py
+# 4. Run centralised detection demo
+python federated_yolov5_app.py
 ```
 Ensure your input frames or videos are stored in:
 
@@ -209,9 +214,8 @@ A backend dashboard is available for uploading videos and visualising detections
 
 To run:
 ```
-cd backend
-export FLASK_APP=app.py
-flask run 
+cd fl
+python federated_app.py
 ```
 Access it via your browser at http://127.0.0.1:5000 
 
